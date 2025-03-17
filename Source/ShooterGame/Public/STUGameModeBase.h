@@ -9,5 +9,6 @@
 UCLASS()
 class SHOOTERGAME_API ASTUGameModeBase : public AGameModeBase
 {
-    GENERATED_BODY()
+	GENERATED_BODY()
+	
 };
