@@ -1,5 +1,12 @@
 // Shoot Then Up Game, All Rights Reserved
 
+#include "STUGameModeBase.h"
+#include "STUBaseCharacter.h"
+#include "STUPlayerController.h"
 
-#include "ShooterGame/Public/STUGameModeBase.h"
 
+ASTUGameModeBase :: ASTUGameModeBase()
+{
+    DefaultPawnClass = ASTUBaseCharacter :: StaticClass();
+    PlayerControllerClass = ASTUPlayerController :: StaticClass();
+}

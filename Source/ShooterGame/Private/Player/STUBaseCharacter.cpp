@@ -1,6 +1,7 @@
 // Shoot Then Up Game, All Rights Reserved
 
-#include "ShooterGame/Public/Player/STUBaseCharacter.h"
+#include "STUBaseCharacter.h"
+#include "STUPlayerController.h"
 
 ASTUBaseCharacter::ASTUBaseCharacter()
 {
