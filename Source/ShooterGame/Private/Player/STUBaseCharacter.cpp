@@ -1,7 +1,6 @@
 // Shoot Then Up Game, All Rights Reserved
 
 #include "STUBaseCharacter.h"
-#include "STUPlayerController.h"
 #include "Camera/CameraComponent.h"
 #include "Components/InputComponent.h"
 #include "GameFramework/SpringArmComponent.h"

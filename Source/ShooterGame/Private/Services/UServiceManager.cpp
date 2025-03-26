@@ -1,6 +1,6 @@
 // Shoot Then Up Game, All Rights Reserved
 
-#include "Services/UServiceManager.h"
+#include "UServiceManager.h"
 
 UServiceManager::UServiceManager()
 {

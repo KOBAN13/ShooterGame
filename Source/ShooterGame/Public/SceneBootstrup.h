@@ -6,7 +6,7 @@
 #include "GameFramework/Actor.h"
 #include "SceneBootstrup.generated.h"
 
-class UServiceManager;
+class UServiceLocator;
 
 UCLASS()
 class SHOOTERGAME_API ASceneBootstrup : public AActor
@@ -18,10 +18,4 @@ public:
 
 protected:
     virtual void BeginPlay() override;
-
-public:
-    virtual void Tick(float DeltaTime) override;
-
-private:
-       TWeakObjectPtr<UServiceManager> ServiceManager;
 };
