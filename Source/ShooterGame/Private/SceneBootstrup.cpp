@@ -13,8 +13,8 @@ ASceneBootstrup::ASceneBootstrup()
 void ASceneBootstrup::BeginPlay()
 {
     Super::BeginPlay();
-    
-    if(ServiceManager.IsValid())
+
+    if (ServiceManager.IsValid())
     {
         UServiceManager* ServiceManagerPtr = ServiceManager.Get();
         ServiceManagerPtr -> RegisterService<UTestService>(UTestService::StaticClass());
@@ -22,9 +22,19 @@ void ASceneBootstrup::BeginPlay()
 
     UTestService* TestService;
 
-    if(ServiceManager.IsValid() && ServiceManager -> TryGetService<UTestService>(TestService))
+    if (ServiceManager.IsValid() && ServiceManager->TryGetService<UTestService>(TestService))
     {
-        TestService -> WorkService();
+        if(TestService == nullptr)
+            return;
+        
+        TestService->WorkService();
+        
+        ServiceManager -> UnregisterService<UTestService>(TestService,
+            OnServiceUnregistered::CreateLambda([]
+            {
+                UE_LOG(LogTemp, Warning, TEXT("Service %s unregistered"),
+                    *UTestService::StaticClass()->GetName());
+            }));
     }
 }
 

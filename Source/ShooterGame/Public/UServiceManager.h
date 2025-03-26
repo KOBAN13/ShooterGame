@@ -11,16 +11,11 @@ class SHOOTERGAME_API UServiceManager : public UObject
 {
     GENERATED_BODY()
 
-private:
     TMap<UClass*, TWeakObjectPtr<>> Services;
-
-private:
     void InitializeFields();
 
 public:
     UServiceManager();
-
-public:
     template <typename T = UObject>
     bool TryGetService(T*& OutService)
     {
@@ -40,6 +35,9 @@ public:
     template <typename T = UClass>
     void RegisterService(TSubclassOf<T> ServiceClass)
     {
+        if(ServiceClass == nullptr)
+            return;
+        
         UClass* Class = ServiceClass.Get();
 
         if (Services.Contains(Class))
@@ -55,11 +53,14 @@ public:
     }
 
     template <typename T = UClass>
-    void UnregisterService(T* ServiceClass, OnServiceUnregistered OnServiceUnregistered)
+    void UnregisterService(T* ServiceClass, OnServiceUnregistered OnServiceUnregistered = {})
     {
+        if(ServiceClass == nullptr)
+            return;
+        
         UClass* Class = T::StaticClass();
 
-        if (Services.Contains(Class) && Services[ServiceClass] == Class)
+        if (Services.Contains(Class))
         {
             Services.Remove(Class);
             OnServiceUnregistered.Execute();
