@@ -9,10 +9,5 @@ UServiceManager::UServiceManager()
 
 void UServiceManager::InitializeFields()
 {
-    Services = TMap<UClass*, TSharedPtr<UObject>>();
-}
-
-UServiceManager::~UServiceManager()
-{
-    Services.Empty();
+    Services = TMap<UClass*, TWeakObjectPtr<>>();
 }

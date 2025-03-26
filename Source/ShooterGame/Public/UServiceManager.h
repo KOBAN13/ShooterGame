@@ -4,27 +4,28 @@
 #include "CoreMinimal.h"
 #include "UServiceManager.generated.h"
 
+DECLARE_DELEGATE(OnServiceUnregistered);
+
 UCLASS()
 class SHOOTERGAME_API UServiceManager : public UObject
 {
     GENERATED_BODY()
 
 private:
-    TMap<UClass*, TSharedPtr<UObject>> Services;
+    TMap<UClass*, TWeakObjectPtr<>> Services;
 
 private:
     void InitializeFields();
 
 public:
     UServiceManager();
-    virtual ~UServiceManager() override;
 
 public:
     template <typename T = UObject>
     bool TryGetService(T*& OutService)
     {
         UClass* Class = T::StaticClass();
-        TSharedPtr<UObject>* FindService = Services.Find(Class);
+        TWeakObjectPtr<>* FindService = Services.Find(Class);
 
         if (FindService && FindService->IsValid())
         {
@@ -48,8 +49,20 @@ public:
         else
         {
             T* Instance = NewObject<T>(this, ServiceClass);
-            Services.Add(Class, TSharedPtr<UObject>(Instance));
+            Services.Add(Class, TWeakObjectPtr<>(Instance));
             UE_LOG(LogTemp, Warning, TEXT("Service registered {%s}"), *ServiceClass->GetName());
+        }
+    }
+
+    template <typename T = UClass>
+    void UnregisterService(T* ServiceClass, OnServiceUnregistered OnServiceUnregistered)
+    {
+        UClass* Class = T::StaticClass();
+
+        if (Services.Contains(Class) && Services[ServiceClass] == Class)
+        {
+            Services.Remove(Class);
+            OnServiceUnregistered.Execute();
         }
     }
 };

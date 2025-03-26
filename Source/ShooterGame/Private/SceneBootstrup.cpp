@@ -13,8 +13,19 @@ ASceneBootstrup::ASceneBootstrup()
 void ASceneBootstrup::BeginPlay()
 {
     Super::BeginPlay();
+    
+    if(ServiceManager.IsValid())
+    {
+        UServiceManager* ServiceManagerPtr = ServiceManager.Get();
+        ServiceManagerPtr -> RegisterService<UTestService>(UTestService::StaticClass());
+    }
 
-    ServiceManager -> RegisterService<UTestService>(UTestService::StaticClass());
+    UTestService* TestService;
+
+    if(ServiceManager.IsValid() && ServiceManager -> TryGetService<UTestService>(TestService))
+    {
+        TestService -> WorkService();
+    }
 }
 
 void ASceneBootstrup::Tick(float DeltaTime)
