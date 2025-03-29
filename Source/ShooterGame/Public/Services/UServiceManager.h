@@ -13,8 +13,9 @@ class SHOOTERGAME_API UServiceManager : public UObject
     
     TMap<UClass*, TWeakObjectPtr<>> Services;
     void InitializeFields();
-    
     UServiceManager();
+
+public:
     template <typename T = UObject>
     bool TryGetService(T*& OutService)
     {

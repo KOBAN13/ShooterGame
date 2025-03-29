@@ -17,13 +17,22 @@ class SHOOTERGAME_API UServiceLocatorSubsystem : public UGameInstanceSubsystem
 
 public:
     template <typename T = UObject>
-    bool TryGetService(T*& OutService) const;
+    bool TryGetService(T*& OutService) const
+    {
+        return ServiceManager -> TryGetService(OutService);
+    }
 
     template <typename T = UClass>
-    void RegisterService(TSubclassOf<T> ServiceClass) const;
+    void RegisterService(TSubclassOf<T> ServiceClass) const
+    {
+        ServiceManager -> RegisterService(ServiceClass);
+    }
 
     template <typename T = UClass>
-    void UnregisterService(T* ServiceClass, OnServiceUnregistered OnServiceUnregistered = {}) const;
+    void UnregisterService(T* ServiceClass, OnServiceUnregistered OnServiceUnregistered = {})
+    {
+        ServiceManager -> UnregisterService(ServiceClass, OnServiceUnregistered);
+    }
 
     virtual void Deinitialize() override;
     virtual void Initialize(FSubsystemCollectionBase& Collection) override;

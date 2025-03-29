@@ -18,21 +18,3 @@ void UServiceLocatorSubsystem::Deinitialize()
     ServiceManager -> Deinitialize();
     ServiceManager = nullptr;
 }
-
-template <typename T>
-bool UServiceLocatorSubsystem::TryGetService(T*& OutService) const
-{
-    return ServiceManager -> TryGetService(OutService);
-}
-
-template <typename T>
-void UServiceLocatorSubsystem::RegisterService(TSubclassOf<T> ServiceClass) const
-{
-    ServiceManager -> RegisterService(ServiceClass);
-}
-
-template <typename T>
-void UServiceLocatorSubsystem::UnregisterService(T* ServiceClass, OnServiceUnregistered OnServiceUnregistered) const
-{
-    ServiceManager -> UnregisterService(ServiceClass, OnServiceUnregistered);
-}
