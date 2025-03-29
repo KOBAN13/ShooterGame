@@ -10,11 +10,10 @@ UCLASS()
 class SHOOTERGAME_API UServiceManager : public UObject
 {
     GENERATED_BODY()
-
+    
     TMap<UClass*, TWeakObjectPtr<>> Services;
     void InitializeFields();
-
-public:
+    
     UServiceManager();
     template <typename T = UObject>
     bool TryGetService(T*& OutService)
@@ -66,4 +65,7 @@ public:
             OnServiceUnregistered.Execute();
         }
     }
+
+public:
+    void Deinitialize();
 };

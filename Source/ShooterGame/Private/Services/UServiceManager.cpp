@@ -11,3 +11,11 @@ void UServiceManager::InitializeFields()
 {
     Services = TMap<UClass*, TWeakObjectPtr<>>();
 }
+
+void UServiceManager::Deinitialize()
+{
+    Services.Empty();
+}
+
+
+
