@@ -57,6 +57,7 @@ void ASTUBaseCharacter::BindInputAxis(UInputComponent* PlayerInputComponent)
     PlayerInputComponent->BindAxis("MoveForward", this, &ASTUBaseCharacter::MoveForward);
     PlayerInputComponent->BindAxis("TurnAround", this, &ASTUBaseCharacter::TurnAround);
     PlayerInputComponent->BindAxis("LookUp", this, &ASTUBaseCharacter::LookUp);
+    PlayerInputComponent->BindAction("Jump", IE_Pressed, this, &ASTUBaseCharacter::Jump);
 }
 
 void ASTUBaseCharacter::CreateComponentsAndAttach()
