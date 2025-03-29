@@ -53,12 +53,14 @@ public:
     }
 
     template <typename T = UClass>
-    void UnregisterService(T* ServiceClass, OnServiceUnregistered OnServiceUnregistered = {})
+    void UnregisterService(OnServiceUnregistered OnServiceUnregistered = {})
     {
+        auto ServiceClass = T::StaticClass();
+        
         if(ServiceClass == nullptr)
             return;
         
-        UClass* Class = T::StaticClass();
+        auto Class = T::StaticClass();
 
         if (Services.Contains(Class))
         {

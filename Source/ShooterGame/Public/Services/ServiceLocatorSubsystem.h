@@ -29,9 +29,9 @@ public:
     }
 
     template <typename T = UClass>
-    void UnregisterService(T* ServiceClass, OnServiceUnregistered OnServiceUnregistered = {})
+    void UnregisterService(OnServiceUnregistered OnServiceUnregistered = {}) const
     {
-        ServiceManager -> UnregisterService(ServiceClass, OnServiceUnregistered);
+        ServiceManager -> UnregisterService(OnServiceUnregistered);
     }
 
     virtual void Deinitialize() override;

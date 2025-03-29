@@ -37,7 +37,7 @@ void ASceneBootstrup::BeginPlay()
     ServiceLocatorSubsystem -> TryGetService<UTestService>(TestService);
     TestService -> WorkService();
 
-    ServiceLocatorSubsystem -> UnregisterService<UTestService>(TestService,
+    ServiceLocatorSubsystem -> UnregisterService<UTestService>(
         OnServiceUnregistered::CreateLambda([]()
         {
             UE_LOG(LogTemp, Warning, TEXT("Service %s unregistered"),
