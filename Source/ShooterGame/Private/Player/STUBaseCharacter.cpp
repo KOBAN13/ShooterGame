@@ -3,6 +3,7 @@
 #include "STUBaseCharacter.h"
 #include "Camera/CameraComponent.h"
 #include "Components/InputComponent.h"
+#include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/SpringArmComponent.h"
 
 ASTUBaseCharacter::ASTUBaseCharacter()
@@ -58,14 +59,20 @@ void ASTUBaseCharacter::BindInputAxis(UInputComponent* PlayerInputComponent)
     PlayerInputComponent->BindAxis("TurnAround", this, &ASTUBaseCharacter::TurnAround);
     PlayerInputComponent->BindAxis("LookUp", this, &ASTUBaseCharacter::LookUp);
     PlayerInputComponent->BindAction("Jump", IE_Pressed, this, &ASTUBaseCharacter::Jump);
+    PlayerInputComponent->BindAction("Run", IE_Repeat, this, &ASTUBaseCharacter::Run);
 }
 
 void ASTUBaseCharacter::CreateComponentsAndAttach()
 {
     SpringArmComponent = CreateDefaultSubobject<USpringArmComponent>("ArmComponent");
-    SpringArmComponent -> SetupAttachment(GetRootComponent());
-    SpringArmComponent -> bUsePawnControlRotation = true;
-    
+    SpringArmComponent->SetupAttachment(GetRootComponent());
+    SpringArmComponent->bUsePawnControlRotation = true;
+
     CameraComponent = CreateDefaultSubobject<UCameraComponent>("CameraComponent");
-    CameraComponent -> SetupAttachment(SpringArmComponent);
+    CameraComponent->SetupAttachment(SpringArmComponent);
+}
+
+void ASTUBaseCharacter::Run()
+{
+    auto CurrentMaxSpeed = GetCharacterMovement() -> MaxWalkSpeed;
 }

@@ -39,4 +39,5 @@ private:
     void TurnAround(float Amount);
     void BindInputAxis(UInputComponent* PlayerInputComponent);
     void CreateComponentsAndAttach();
+    void Run();
 };
