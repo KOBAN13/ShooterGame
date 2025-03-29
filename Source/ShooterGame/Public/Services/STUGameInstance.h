@@ -11,7 +11,8 @@ class UServiceLocatorSubsystem;
 UCLASS()
 class SHOOTERGAME_API USTUGameInstance : public UGameInstance
 {
-	GENERATED_BODY()
-    
+    GENERATED_BODY()
+
+public:
     UServiceLocatorSubsystem* GetServiceLocatorSubsystem() const;
 };
