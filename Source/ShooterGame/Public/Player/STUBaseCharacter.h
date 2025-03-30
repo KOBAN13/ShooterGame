@@ -7,6 +7,9 @@
 #include "GameFramework/Character.h"
 #include "STUBaseCharacter.generated.h"
 
+DEFINE_LOG_CATEGORY_STATIC(CharacterLogs, All, All);
+
+class UCharacterConfig;
 class UCameraComponent;
 class USpringArmComponent;
 
@@ -21,6 +24,9 @@ public:
 
     UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Components")
     USpringArmComponent* SpringArmComponent;
+
+    UPROPERTY()
+    UCharacterConfig* CharacterConfig;
 
 protected:
     virtual void BeginPlay() override;
@@ -40,4 +46,6 @@ private:
     void BindInputAxis(UInputComponent* PlayerInputComponent);
     void CreateComponentsAndAttach();
     void Run();
+
+    void LoadConfigs();
 };

@@ -3,6 +3,7 @@
 #include "STUBaseCharacter.h"
 #include "Camera/CameraComponent.h"
 #include "Components/InputComponent.h"
+#include "Config/CharacterConfig.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/SpringArmComponent.h"
 
@@ -10,6 +11,7 @@ ASTUBaseCharacter::ASTUBaseCharacter()
 {
     PrimaryActorTick.bCanEverTick = true;
 
+    LoadConfigs();
     CreateComponentsAndAttach();
 }
 
@@ -70,9 +72,26 @@ void ASTUBaseCharacter::CreateComponentsAndAttach()
 
     CameraComponent = CreateDefaultSubobject<UCameraComponent>("CameraComponent");
     CameraComponent->SetupAttachment(SpringArmComponent);
+
+    GetCharacterMovement() -> MaxWalkSpeed = CharacterConfig -> MaxSpeed;
 }
 
 void ASTUBaseCharacter::Run()
 {
-    auto CurrentMaxSpeed = GetCharacterMovement() -> MaxWalkSpeed;
+    float CurrentMaxSpeed = GetCharacterMovement() -> MaxWalkSpeed;
+}
+
+void ASTUBaseCharacter::LoadConfigs()
+{
+    FSoftObjectPath ConfigPath(TEXT("/Game/Configs/DA_CharacterConfig.DA_CharacterConfig"));
+    UObject* ConfigCharacterParameters = ConfigPath.TryLoad();
+
+    if(UCharacterConfig* Config = Cast<UCharacterConfig>(ConfigCharacterParameters))
+    {
+        CharacterConfig = Config;
+        UE_LOG(CharacterLogs, Warning, TEXT("CharacterConfig: %s is loaded"), *CharacterConfig->GetName());
+        return;
+    }
+
+    UE_LOG(CharacterLogs, Warning, TEXT("CharacterConfig: %s is not loaded"), *CharacterConfig->GetName());
 }
