@@ -1,6 +1,10 @@
 // Shoot Then Up Game, All Rights Reserved
 
 #include "STUBaseCharacter.h"
+
+#include "STUGameInstance.h"
+#include "ServiceLocatorSubsystem.h"
+#include "TweenService.h"
 #include "Camera/CameraComponent.h"
 #include "Components/InputComponent.h"
 #include "Config/CharacterConfig.h"
@@ -18,6 +22,9 @@ ASTUBaseCharacter::ASTUBaseCharacter()
 void ASTUBaseCharacter::BeginPlay()
 {
     Super::BeginPlay();
+
+    USTUGameInstance* GameInstance = Cast<USTUGameInstance>(GetGameInstance());
+    ServiceLocator = GameInstance -> GetServiceLocatorSubsystem();
 }
 
 void ASTUBaseCharacter::Tick(float DeltaTime)
@@ -61,7 +68,8 @@ void ASTUBaseCharacter::BindInputAxis(UInputComponent* PlayerInputComponent)
     PlayerInputComponent->BindAxis("TurnAround", this, &ASTUBaseCharacter::TurnAround);
     PlayerInputComponent->BindAxis("LookUp", this, &ASTUBaseCharacter::LookUp);
     PlayerInputComponent->BindAction("Jump", IE_Pressed, this, &ASTUBaseCharacter::Jump);
-    PlayerInputComponent->BindAction("Run", IE_Repeat, this, &ASTUBaseCharacter::Run);
+    PlayerInputComponent->BindAction("RunStart", IE_Pressed, this, &ASTUBaseCharacter::RunStart);
+    PlayerInputComponent->BindAction("RunEnd", IE_Released, this, &ASTUBaseCharacter::RunEnd);
 }
 
 void ASTUBaseCharacter::CreateComponentsAndAttach()
@@ -76,9 +84,38 @@ void ASTUBaseCharacter::CreateComponentsAndAttach()
     GetCharacterMovement() -> MaxWalkSpeed = CharacterConfig -> MaxSpeed;
 }
 
-void ASTUBaseCharacter::Run()
+void ASTUBaseCharacter::RunStart()
+{
+    auto CurrentMaxSpeed = GetCharacterMovement() -> MaxWalkSpeed;
+
+    UTweenService* TweenService = nullptr;
+    
+    if(ServiceLocator -> TryGetService(TweenService))
+    {
+        TweenService -> TweenFloat(CurrentMaxSpeed,
+            CharacterConfig -> RunSpeed,
+            CharacterConfig -> TimeInterpolation,
+            [this](float Speed) { GetCharacterMovement() -> MaxWalkSpeed = Speed; },
+            []() { GEngine -> AddOnScreenDebugMessage(-1, 5.0f, FColor::Red, TEXT("RunEnd")); }
+            );
+    }
+}
+
+void ASTUBaseCharacter::RunEnd()
 {
     float CurrentMaxSpeed = GetCharacterMovement() -> MaxWalkSpeed;
+
+    UTweenService* TweenService = nullptr;
+
+    if(ServiceLocator -> TryGetService(TweenService))
+    {
+        TweenService -> TweenFloat(CurrentMaxSpeed,
+            CharacterConfig -> MaxSpeed,
+            CharacterConfig -> TimeInterpolation,
+            [this](float Speed) { GetCharacterMovement() -> MaxWalkSpeed = Speed; },
+            []() { GEngine -> AddOnScreenDebugMessage(-1, 5.0f, FColor::Red, TEXT("RunEnd")); }
+            );
+    }
 }
 
 void ASTUBaseCharacter::LoadConfigs()

@@ -12,6 +12,7 @@ DEFINE_LOG_CATEGORY_STATIC(CharacterLogs, All, All);
 class UCharacterConfig;
 class UCameraComponent;
 class USpringArmComponent;
+class UServiceLocatorSubsystem;
 
 UCLASS()
 class SHOOTERGAME_API ASTUBaseCharacter : public ACharacter
@@ -27,6 +28,9 @@ public:
 
     UPROPERTY()
     UCharacterConfig* CharacterConfig;
+
+    UPROPERTY()
+    UServiceLocatorSubsystem* ServiceLocator;
 
 protected:
     virtual void BeginPlay() override;
@@ -45,7 +49,8 @@ private:
     void TurnAround(float Amount);
     void BindInputAxis(UInputComponent* PlayerInputComponent);
     void CreateComponentsAndAttach();
-    void Run();
+    void RunStart();
+    void RunEnd();
 
     void LoadConfigs();
 };
