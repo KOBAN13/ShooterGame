@@ -32,6 +32,10 @@ public:
     UPROPERTY()
     UServiceLocatorSubsystem* ServiceLocator;
 
+private:
+    int32 IdTweenRunStart = 0;
+    int32 IdTweenRunEnd = 0;
+
 protected:
     virtual void BeginPlay() override;
 

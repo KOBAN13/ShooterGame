@@ -13,13 +13,15 @@ class SHOOTERGAME_API UTweenService : public UObject, public FTickableGameObject
 public:
     UTweenService();
 
-    void TweenFloat(
+    int32 TweenFloat(
         float Start,
         float End,
         float Duration,
         const TFunction<void(float)>& OnUpdate,
         const TFunction<void()>& OnComplete = nullptr
     );
+    
+    void TweenKill(int32 IdTween);
 
     virtual void Tick(float DeltaTime) override;
     virtual bool IsTickable() const override { return true; }
@@ -34,9 +36,11 @@ private:
         float End;
         float Duration;
         float Elapsed;
+        int32 Id;
         TFunction<void(float)> OnUpdate;
         TFunction<void()> OnComplete;
     };
+    int32 NextTweenId = 0;
 
     TArray<FTweenData> ActiveTweens;
 };

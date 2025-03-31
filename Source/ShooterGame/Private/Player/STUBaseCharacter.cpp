@@ -92,11 +92,15 @@ void ASTUBaseCharacter::RunStart()
     
     if(ServiceLocator -> TryGetService(TweenService))
     {
-        TweenService -> TweenFloat(CurrentMaxSpeed,
+        TweenService -> TweenKill(IdTweenRunStart);
+        IdTweenRunStart = TweenService -> TweenFloat(CurrentMaxSpeed,
             CharacterConfig -> RunSpeed,
             CharacterConfig -> TimeInterpolation,
-            [this](float Speed) { GetCharacterMovement() -> MaxWalkSpeed = Speed; },
-            []() { GEngine -> AddOnScreenDebugMessage(-1, 5.0f, FColor::Red, TEXT("RunEnd")); }
+            [this](float Speed)
+            {
+                GetCharacterMovement() -> MaxWalkSpeed = Speed;
+            },
+            []() { GEngine -> AddOnScreenDebugMessage(-1, 5.0f, FColor::Red, TEXT("RunStart")); }
             );
     }
 }
@@ -109,10 +113,14 @@ void ASTUBaseCharacter::RunEnd()
 
     if(ServiceLocator -> TryGetService(TweenService))
     {
-        TweenService -> TweenFloat(CurrentMaxSpeed,
+        TweenService -> TweenKill(IdTweenRunEnd);
+        IdTweenRunEnd = TweenService -> TweenFloat(CurrentMaxSpeed,
             CharacterConfig -> MaxSpeed,
             CharacterConfig -> TimeInterpolation,
-            [this](float Speed) { GetCharacterMovement() -> MaxWalkSpeed = Speed; },
+            [this](float Speed)
+            {
+                GetCharacterMovement() -> MaxWalkSpeed = Speed;
+            },
             []() { GEngine -> AddOnScreenDebugMessage(-1, 5.0f, FColor::Red, TEXT("RunEnd")); }
             );
     }
