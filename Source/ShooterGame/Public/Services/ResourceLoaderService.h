@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Engine/StreamableManager.h"
 #include "ResourceLoaderService.generated.h"
 
 
@@ -12,13 +13,11 @@ class SHOOTERGAME_API UResourceLoaderService : public UObject
 	GENERATED_BODY()
 
     UResourceLoaderService();
-
-private:
+    
     UPROPERTY()
-        TMap<FName, UDataAsset*> ResourceMap;
-
-
-    void LoadResources();   
+    TMap<FName, UDataAsset*> ResourceMap;
+    void LoadResources();
+    FStreamableManager StreamableManager;
 
 public:
     UDataAsset* GetResource(FName Name);

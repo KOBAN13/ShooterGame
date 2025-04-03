@@ -1,9 +1,23 @@
 // Shoot Then Up Game, All Rights Reserved
 
 #include "Services/STUGameInstance.h"
+
+#include "ResourceLoaderService.h"
+#include "TweenService.h"
 #include "Services/ServiceLocatorSubsystem.h"
 
-UServiceLocatorSubsystem* USTUGameInstance::GetServiceLocatorSubsystem() const
+
+void USTUGameInstance::Init()
 {
-    return GetSubsystem<UServiceLocatorSubsystem>();
+    Super::Init();
+
+    ServiceLocatorSubsystem = GetSubsystem<UServiceLocatorSubsystem>();
+
+    ServiceLocatorSubsystem->RegisterService<UTweenService>(UTweenService::StaticClass());
+    ServiceLocatorSubsystem->RegisterService<UResourceLoaderService>(UResourceLoaderService::StaticClass());
+}
+
+UServiceLocatorSubsystem* USTUGameInstance::GetServiceLocator() const
+{
+    return ServiceLocatorSubsystem;
 }

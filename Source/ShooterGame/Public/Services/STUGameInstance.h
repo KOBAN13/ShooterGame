@@ -13,6 +13,10 @@ class SHOOTERGAME_API USTUGameInstance : public UGameInstance
 {
     GENERATED_BODY()
 
+    UPROPERTY()
+    UServiceLocatorSubsystem* ServiceLocatorSubsystem;
+    virtual void Init() override;
+
 public:
-    UServiceLocatorSubsystem* GetServiceLocatorSubsystem() const;
+    UServiceLocatorSubsystem* GetServiceLocator() const;
 };

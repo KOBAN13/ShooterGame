@@ -7,23 +7,36 @@
 UResourceLoaderService::UResourceLoaderService()
 {
     ResourceMap = TMap<FName, UDataAsset*>();
+
+    LoadResources();
 }
 
 void UResourceLoaderService::LoadResources()
 {
-    FStreamableManager StreamableManager;
-
     const FSoftObjectPath ConfigPath(Constants::CharacterConfig);
+
+    if(!ConfigPath.IsValid())
+    {
+        UE_LOG(LogTemp, Error, TEXT("Invalid Character Config Path"));
+        return;
+    }
+
+    if (ResourceMap.Contains(Constants::CharacterConfig))
+        return;
+
+    
     TSharedPtr<FStreamableHandle> Handle =
-        StreamableManager.RequestAsyncLoad(ConfigPath, FStreamableDelegate ::CreateLambda(
-                                                           [this, &Handle]()
+        StreamableManager.RequestAsyncLoad(ConfigPath, FStreamableDelegate :: CreateLambda(
+                                                           [this, ConfigPath]()
                                                            {
-                                                               if (!ResourceMap.Contains(Constants::CharacterConfig))
+                                                               if (UDataAsset* Config = Cast<UDataAsset>(ConfigPath.TryLoad()))
                                                                {
-                                                                   if (UDataAsset* Config = Cast<UDataAsset>(Handle->GetLoadedAsset()))
-                                                                   {
-                                                                       ResourceMap.Add(Constants::CharacterConfig, Config);
-                                                                   }
+                                                                   ResourceMap.Add(Constants::CharacterConfig, Config);
+                                                                   UE_LOG(LogTemp, Warning, TEXT("Loaded Character Config"));
+                                                               }
+                                                               else
+                                                               {
+                                                                   UE_LOG(LogTemp, Error, TEXT("Failed to load Character Config")); 
                                                                }
                                                            }));
 }

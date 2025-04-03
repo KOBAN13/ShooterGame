@@ -13,7 +13,6 @@
 #include "GameFramework/SpringArmComponent.h"
 #include "Helpers/Constants.h"
 
-
 ASTUBaseCharacter::ASTUBaseCharacter()
 {
     PrimaryActorTick.bCanEverTick = true;
@@ -26,7 +25,7 @@ void ASTUBaseCharacter::BeginPlay()
     Super::BeginPlay();
     Initialize();
 
-    GetCharacterMovement() -> MaxWalkSpeed = CharacterConfig -> MaxSpeed;
+    //GetCharacterMovement() -> MaxWalkSpeed = CharacterConfig -> MaxSpeed;
 }
 
 void ASTUBaseCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
@@ -119,7 +118,7 @@ void ASTUBaseCharacter::RunEnd()
 void ASTUBaseCharacter::Initialize()
 {
     USTUGameInstance* GameInstance = Cast<USTUGameInstance>(GetGameInstance());
-    ServiceLocator = GameInstance -> GetServiceLocatorSubsystem();
+    ServiceLocator = GameInstance -> GetServiceLocator();
     
     UResourceLoaderService* ResourceLoaderService = nullptr;
     
