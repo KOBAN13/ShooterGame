@@ -55,6 +55,4 @@ private:
     void CreateComponentsAndAttach();
     void RunStart();
     void RunEnd();
-
-    void LoadConfigs();
 };

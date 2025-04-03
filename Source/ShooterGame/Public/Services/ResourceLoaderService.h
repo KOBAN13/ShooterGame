@@ -15,5 +15,11 @@ class SHOOTERGAME_API UResourceLoaderService : public UObject
 
 private:
     UPROPERTY()
-        TMap<FString, FSoftObjectPath> ResourceMap;
+        TMap<FName, UDataAsset*> ResourceMap;
+
+
+    void LoadResources();   
+
+public:
+    UDataAsset* GetResource(FName Name);
 };

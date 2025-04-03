@@ -2,6 +2,7 @@
 
 #include "STUBaseCharacter.h"
 
+#include "ResourceLoaderService.h"
 #include "STUGameInstance.h"
 #include "ServiceLocatorSubsystem.h"
 #include "TweenService.h"
@@ -10,12 +11,12 @@
 #include "Config/CharacterConfig.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/SpringArmComponent.h"
+#include "Helpers/Constants.h"
 
 ASTUBaseCharacter::ASTUBaseCharacter()
 {
     PrimaryActorTick.bCanEverTick = true;
-
-    LoadConfigs();
+    
     CreateComponentsAndAttach();
 }
 
@@ -25,6 +26,14 @@ void ASTUBaseCharacter::BeginPlay()
 
     USTUGameInstance* GameInstance = Cast<USTUGameInstance>(GetGameInstance());
     ServiceLocator = GameInstance -> GetServiceLocatorSubsystem();
+    
+    UResourceLoaderService* ResourceLoaderService = nullptr;
+    
+    if(ServiceLocator -> TryGetService(ResourceLoaderService))
+    {
+        CharacterConfig = Cast<UCharacterConfig>(ResourceLoaderService
+            -> GetResource(Constants::CharacterConfig));
+    }
 }
 
 void ASTUBaseCharacter::Tick(float DeltaTime)
@@ -124,19 +133,4 @@ void ASTUBaseCharacter::RunEnd()
             []() { GEngine -> AddOnScreenDebugMessage(-1, 5.0f, FColor::Red, TEXT("RunEnd")); }
             );
     }
-}
-
-void ASTUBaseCharacter::LoadConfigs()
-{
-    FSoftObjectPath ConfigPath(TEXT("/Game/Configs/DA_CharacterConfig.DA_CharacterConfig"));
-    UObject* ConfigCharacterParameters = ConfigPath.TryLoad();
-
-    if(UCharacterConfig* Config = Cast<UCharacterConfig>(ConfigCharacterParameters))
-    {
-        CharacterConfig = Config;
-        UE_LOG(CharacterLogs, Warning, TEXT("CharacterConfig: %s is loaded"), *CharacterConfig->GetName());
-        return;
-    }
-
-    UE_LOG(CharacterLogs, Warning, TEXT("CharacterConfig: %s is not loaded"), *CharacterConfig->GetName());
 }
