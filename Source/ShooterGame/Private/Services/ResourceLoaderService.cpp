@@ -7,8 +7,6 @@
 UResourceLoaderService::UResourceLoaderService()
 {
     ResourceMap = TMap<FName, UDataAsset*>();
-
-    LoadResources();
 }
 
 void UResourceLoaderService::LoadResources()

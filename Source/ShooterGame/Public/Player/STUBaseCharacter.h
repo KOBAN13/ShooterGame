@@ -42,8 +42,6 @@ protected:
 public:
     ASTUBaseCharacter();
 
-    virtual void Tick(float DeltaTime) override;
-
     virtual void SetupPlayerInputComponent(UInputComponent* PlayerInputComponent) override;
 
 private:
@@ -55,4 +53,5 @@ private:
     void CreateComponentsAndAttach();
     void RunStart();
     void RunEnd();
+    void Initialize();
 };
