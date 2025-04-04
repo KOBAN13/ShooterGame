@@ -122,7 +122,7 @@ void ASTUBaseCharacter::OnCharacterConfigLoaded()
         UDataAsset* DataAsset = ResourceLoaderService
             -> GetResource(Constants::CharacterConfig);
 
-        check(DataAsset == nullptr)
+        check(DataAsset->IsValidLowLevel())
 
         CharacterConfig = Cast<UCharacterConfig>(DataAsset);
         GetCharacterMovement() -> MaxWalkSpeed = CharacterConfig -> MaxSpeed;
