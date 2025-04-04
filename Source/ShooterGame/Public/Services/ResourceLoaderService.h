@@ -6,6 +6,7 @@
 #include "Engine/StreamableManager.h"
 #include "ResourceLoaderService.generated.h"
 
+DECLARE_MULTICAST_DELEGATE(FOnCharacterConfigLoaded);
 
 UCLASS()
 class SHOOTERGAME_API UResourceLoaderService : public UObject
@@ -16,9 +17,10 @@ class SHOOTERGAME_API UResourceLoaderService : public UObject
     
     UPROPERTY()
     TMap<FName, UDataAsset*> ResourceMap;
-    void LoadResources();
     FStreamableManager StreamableManager;
 
 public:
     UDataAsset* GetResource(FName Name);
+    void LoadResources();
+    FOnCharacterConfigLoaded OnCharacterConfigLoaded;
 };

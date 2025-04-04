@@ -7,8 +7,6 @@
 UResourceLoaderService::UResourceLoaderService()
 {
     ResourceMap = TMap<FName, UDataAsset*>();
-
-    LoadResources();
 }
 
 void UResourceLoaderService::LoadResources()
@@ -32,6 +30,7 @@ void UResourceLoaderService::LoadResources()
                                                                if (UDataAsset* Config = Cast<UDataAsset>(ConfigPath.TryLoad()))
                                                                {
                                                                    ResourceMap.Add(Constants::CharacterConfig, Config);
+                                                                   OnCharacterConfigLoaded.Broadcast();
                                                                    UE_LOG(LogTemp, Warning, TEXT("Loaded Character Config"));
                                                                }
                                                                else

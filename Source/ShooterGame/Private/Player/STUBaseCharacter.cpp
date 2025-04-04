@@ -24,8 +24,6 @@ void ASTUBaseCharacter::BeginPlay()
 {
     Super::BeginPlay();
     Initialize();
-
-    //GetCharacterMovement() -> MaxWalkSpeed = CharacterConfig -> MaxSpeed;
 }
 
 void ASTUBaseCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
@@ -71,11 +69,11 @@ void ASTUBaseCharacter::BindInputAxis(UInputComponent* PlayerInputComponent)
 void ASTUBaseCharacter::CreateComponentsAndAttach()
 {
     SpringArmComponent = CreateDefaultSubobject<USpringArmComponent>("ArmComponent");
-    SpringArmComponent->SetupAttachment(GetRootComponent());
-    SpringArmComponent->bUsePawnControlRotation = true;
+    SpringArmComponent -> SetupAttachment(GetRootComponent());
+    SpringArmComponent -> bUsePawnControlRotation = true;
 
     CameraComponent = CreateDefaultSubobject<UCameraComponent>("CameraComponent");
-    CameraComponent->SetupAttachment(SpringArmComponent);
+    CameraComponent -> SetupAttachment(SpringArmComponent);
 }
 
 void ASTUBaseCharacter::RunStart()
@@ -105,13 +103,29 @@ void ASTUBaseCharacter::RunEnd()
 
     UTweenService* TweenService = nullptr;
 
-    if (ServiceLocator -> TryGetService(TweenService))
+    if (ServiceLocator->TryGetService(TweenService))
     {
         TweenService->TweenKill(IdTweenRunEnd);
         IdTweenRunEnd = TweenService->TweenFloat(
             CurrentMaxSpeed, CharacterConfig->MaxSpeed, CharacterConfig->TimeInterpolation,
             [this](float Speed) { GetCharacterMovement()->MaxWalkSpeed = Speed; },
             []() { GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Red, TEXT("RunEnd")); });
+    }
+}
+
+void ASTUBaseCharacter::OnCharacterConfigLoaded()
+{
+    UResourceLoaderService* ResourceLoaderService = nullptr;
+    
+    if(ServiceLocator -> TryGetService(ResourceLoaderService))
+    {
+        UDataAsset* DataAsset = ResourceLoaderService
+            -> GetResource(Constants::CharacterConfig);
+
+        check(DataAsset == nullptr)
+
+        CharacterConfig = Cast<UCharacterConfig>(DataAsset);
+        GetCharacterMovement() -> MaxWalkSpeed = CharacterConfig -> MaxSpeed;
     }
 }
 
@@ -124,12 +138,6 @@ void ASTUBaseCharacter::Initialize()
     
     if(ServiceLocator -> TryGetService(ResourceLoaderService))
     {
-        UDataAsset* DataAsset = ResourceLoaderService
-            -> GetResource(Constants::CharacterConfig);
-
-        if(DataAsset)
-            return;
-        
-        CharacterConfig = Cast<UCharacterConfig>(DataAsset);
+        ResourceLoaderService -> OnCharacterConfigLoaded.AddUObject(this, &ASTUBaseCharacter::OnCharacterConfigLoaded);
     }
 }

@@ -15,6 +15,12 @@ void USTUGameInstance::Init()
 
     ServiceLocatorSubsystem->RegisterService<UTweenService>(UTweenService::StaticClass());
     ServiceLocatorSubsystem->RegisterService<UResourceLoaderService>(UResourceLoaderService::StaticClass());
+
+    UResourceLoaderService* ResourceLoaderService = nullptr;
+    
+    ServiceLocatorSubsystem -> TryGetService(ResourceLoaderService);
+
+    ResourceLoaderService -> LoadResources();
 }
 
 UServiceLocatorSubsystem* USTUGameInstance::GetServiceLocator() const

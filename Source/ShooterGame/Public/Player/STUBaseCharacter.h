@@ -53,5 +53,6 @@ private:
     void CreateComponentsAndAttach();
     void RunStart();
     void RunEnd();
+    void OnCharacterConfigLoaded();
     void Initialize();
 };
