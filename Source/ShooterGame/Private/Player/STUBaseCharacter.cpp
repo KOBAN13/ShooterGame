@@ -2,28 +2,19 @@
 
 #include "STUBaseCharacter.h"
 
-#include "ResourceLoaderService.h"
-#include "STUGameInstance.h"
-#include "ServiceLocatorSubsystem.h"
-#include "TweenService.h"
+#include "STUCharacterMovementComponent.h"
 #include "Camera/CameraComponent.h"
 #include "Components/InputComponent.h"
-#include "CharacterConfig.h"
-#include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/SpringArmComponent.h"
-#include "Constants.h"
 
-ASTUBaseCharacter::ASTUBaseCharacter()
+ASTUBaseCharacter::ASTUBaseCharacter(const FObjectInitializer &ObjectInitializer)
+: Super(ObjectInitializer.SetDefaultSubobjectClass<USTUCharacterMovementComponent>(CharacterMovementComponentName))
 {
     PrimaryActorTick.bCanEverTick = true;
 
+    STUCharacterMovementComponent = Cast<USTUCharacterMovementComponent>(GetCharacterMovement());
+    
     CreateComponentsAndAttach();
-}
-
-void ASTUBaseCharacter::BeginPlay()
-{
-    Super::BeginPlay();
-    Initialize();
 }
 
 bool ASTUBaseCharacter::IsRunning() const
@@ -85,68 +76,14 @@ void ASTUBaseCharacter::CreateComponentsAndAttach()
 
 void ASTUBaseCharacter::RunStart()
 {
-    auto CurrentMaxSpeed = GetCharacterMovement() -> MaxWalkSpeed;
+    bIsRun = true;
 
-    UTweenService* TweenService = nullptr;
-    
-    if(ServiceLocator -> TryGetService(TweenService))
-    {
-        TweenService -> TweenKill(IdTweenRunStart);
-        bIsRun = true;
-        IdTweenRunStart = TweenService -> TweenFloat(CurrentMaxSpeed,
-            CharacterConfig -> RunSpeed,
-            CharacterConfig -> TimeInterpolation,
-            [this](float Speed)
-            {
-                GetCharacterMovement() -> MaxWalkSpeed = Speed;
-            },
-            []() { GEngine -> AddOnScreenDebugMessage(-1, 5.0f, FColor::Red, TEXT("RunStart")); }
-            );
-    }
+    STUCharacterMovementComponent -> RunStart();
 }
 
 void ASTUBaseCharacter::RunEnd()
 {
-    float CurrentMaxSpeed = GetCharacterMovement()->MaxWalkSpeed;
+    bIsRun = false;
 
-    UTweenService* TweenService = nullptr;
-
-    if (ServiceLocator->TryGetService(TweenService))
-    {
-        TweenService->TweenKill(IdTweenRunEnd);
-        bIsRun = false;
-        IdTweenRunEnd = TweenService->TweenFloat(
-            CurrentMaxSpeed, CharacterConfig->MaxSpeed, CharacterConfig->TimeInterpolation,
-            [this](float Speed) { GetCharacterMovement()->MaxWalkSpeed = Speed; },
-            []() { GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Red, TEXT("RunEnd")); });
-    }
-}
-
-void ASTUBaseCharacter::OnCharacterConfigLoaded()
-{
-    UResourceLoaderService* ResourceLoaderService = nullptr;
-    
-    if(ServiceLocator -> TryGetService(ResourceLoaderService))
-    {
-        UDataAsset* DataAsset = ResourceLoaderService
-            -> GetResource(Constants::CharacterConfig);
-
-        check(DataAsset->IsValidLowLevel())
-
-        CharacterConfig = Cast<UCharacterConfig>(DataAsset);
-        GetCharacterMovement() -> MaxWalkSpeed = CharacterConfig -> MaxSpeed;
-    }
-}
-
-void ASTUBaseCharacter::Initialize()
-{
-    USTUGameInstance* GameInstance = Cast<USTUGameInstance>(GetGameInstance());
-    ServiceLocator = GameInstance -> GetServiceLocator();
-    
-    UResourceLoaderService* ResourceLoaderService = nullptr;
-    
-    if(ServiceLocator -> TryGetService(ResourceLoaderService))
-    {
-        ResourceLoaderService -> OnCharacterConfigLoaded.AddUObject(this, &ASTUBaseCharacter::OnCharacterConfigLoaded);
-    }
+    STUCharacterMovementComponent -> RunEnd();
 }

@@ -7,6 +7,7 @@
 #include "GameFramework/Character.h"
 #include "STUBaseCharacter.generated.h"
 
+class USTUCharacterMovementComponent;
 DEFINE_LOG_CATEGORY_STATIC(CharacterLogs, All, All);
 
 class UCharacterConfig;
@@ -27,25 +28,23 @@ public:
     USpringArmComponent* SpringArmComponent;
 
     UPROPERTY()
+    USTUCharacterMovementComponent* STUCharacterMovementComponent;
+
+    UPROPERTY()
     UCharacterConfig* CharacterConfig;
 
     UPROPERTY()
     UServiceLocatorSubsystem* ServiceLocator;
 
 private:
-    int32 IdTweenRunStart = 0;
-    int32 IdTweenRunEnd = 0;
     bool bIsWalk = false;
     bool bIsRun = false;
-
-protected:
-    virtual void BeginPlay() override;
-
+    
 public:
     UFUNCTION(BlueprintCallable, Category = "Movement")
     bool IsRunning() const;
     
-    ASTUBaseCharacter();
+    ASTUBaseCharacter(const FObjectInitializer &ObjectInitializer);
 
     virtual void SetupPlayerInputComponent(UInputComponent* PlayerInputComponent) override;
 
@@ -58,6 +57,4 @@ private:
     void CreateComponentsAndAttach();
     void RunStart();
     void RunEnd();
-    void OnCharacterConfigLoaded();
-    void Initialize();
 };
