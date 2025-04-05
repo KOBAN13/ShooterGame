@@ -25,7 +25,8 @@ class SHOOTERGAME_API USTUCharacterMovementComponent : public UCharacterMovement
     
     void OnCharacterConfigLoaded();
     void Initialize();
-
+    
+    virtual void BeginDestroy() override;
     virtual void InitializeComponent() override;
 
 public:
