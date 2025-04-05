@@ -1,4 +1,5 @@
 // Shoot Then Up Game, All Rights Reserved
 
-#include "CharacterConfig.h"
+
+#include "STUCharacterMovementComponent.h"
 

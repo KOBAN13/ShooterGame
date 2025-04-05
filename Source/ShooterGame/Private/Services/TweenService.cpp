@@ -1,6 +1,6 @@
 // Shoot Then Up Game, All Rights Reserved
 
-#include "Services/TweenService.h"
+#include "TweenService.h"
 
 UTweenService::UTweenService()
 {

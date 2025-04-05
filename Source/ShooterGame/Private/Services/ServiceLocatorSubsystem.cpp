@@ -1,6 +1,6 @@
 // Shoot Then Up Game, All Rights Reserved
 
-#include "Services/ServiceLocatorSubsystem.h"
+#include "ServiceLocatorSubsystem.h"
 #include "UServiceManager.h"
 
 void UServiceLocatorSubsystem::Initialize(FSubsystemCollectionBase& Collection)

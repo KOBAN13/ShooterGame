@@ -1,8 +1,8 @@
 // Shoot Then Up Game, All Rights Reserved
 
-#include "Services/ResourceLoaderService.h"
+#include "ResourceLoaderService.h"
 #include "Engine/StreamableManager.h"
-#include "Helpers/Constants.h"
+#include "Constants.h"
 
 UResourceLoaderService::UResourceLoaderService()
 {

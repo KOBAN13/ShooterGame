@@ -1,10 +1,10 @@
 // Shoot Then Up Game, All Rights Reserved
 
-#include "Services/STUGameInstance.h"
+#include "STUGameInstance.h"
 
 #include "ResourceLoaderService.h"
 #include "TweenService.h"
-#include "Services/ServiceLocatorSubsystem.h"
+#include "ServiceLocatorSubsystem.h"
 
 
 void USTUGameInstance::Init()

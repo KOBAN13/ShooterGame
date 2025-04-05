@@ -8,10 +8,10 @@
 #include "TweenService.h"
 #include "Camera/CameraComponent.h"
 #include "Components/InputComponent.h"
-#include "Config/CharacterConfig.h"
+#include "CharacterConfig.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/SpringArmComponent.h"
-#include "Helpers/Constants.h"
+#include "Constants.h"
 
 ASTUBaseCharacter::ASTUBaseCharacter()
 {
