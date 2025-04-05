@@ -26,6 +26,11 @@ void ASTUBaseCharacter::BeginPlay()
     Initialize();
 }
 
+bool ASTUBaseCharacter::IsRunning() const
+{
+    return bIsRun && bIsWalk && !GetVelocity().IsZero();
+}
+
 void ASTUBaseCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
     Super::SetupPlayerInputComponent(PlayerInputComponent);
@@ -37,6 +42,8 @@ void ASTUBaseCharacter::MoveForward(float Amount)
 {
     FVector ForwardDirection = GetActorForwardVector();
     AddMovementInput(ForwardDirection, Amount);
+
+    bIsWalk = Amount > 0.0f;
 }
 
 void ASTUBaseCharacter::MoveRight(float Amount)
@@ -85,6 +92,7 @@ void ASTUBaseCharacter::RunStart()
     if(ServiceLocator -> TryGetService(TweenService))
     {
         TweenService -> TweenKill(IdTweenRunStart);
+        bIsRun = true;
         IdTweenRunStart = TweenService -> TweenFloat(CurrentMaxSpeed,
             CharacterConfig -> RunSpeed,
             CharacterConfig -> TimeInterpolation,
@@ -106,6 +114,7 @@ void ASTUBaseCharacter::RunEnd()
     if (ServiceLocator->TryGetService(TweenService))
     {
         TweenService->TweenKill(IdTweenRunEnd);
+        bIsRun = false;
         IdTweenRunEnd = TweenService->TweenFloat(
             CurrentMaxSpeed, CharacterConfig->MaxSpeed, CharacterConfig->TimeInterpolation,
             [this](float Speed) { GetCharacterMovement()->MaxWalkSpeed = Speed; },

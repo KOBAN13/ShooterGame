@@ -35,11 +35,16 @@ public:
 private:
     int32 IdTweenRunStart = 0;
     int32 IdTweenRunEnd = 0;
+    bool bIsWalk = false;
+    bool bIsRun = false;
 
 protected:
     virtual void BeginPlay() override;
 
 public:
+    UFUNCTION(BlueprintCallable, Category = "Movement")
+    bool IsRunning() const;
+    
     ASTUBaseCharacter();
 
     virtual void SetupPlayerInputComponent(UInputComponent* PlayerInputComponent) override;
