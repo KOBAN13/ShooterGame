@@ -7,6 +7,8 @@
 #include "UObject/Interface.h"
 #include "EventReceiver.generated.h"
 
+class IEventInterface;
+
 UINTERFACE(MinimalAPI)
 class UEventReceiver : public IBaseEventReceiver
 {
@@ -20,7 +22,7 @@ class SHOOTERGAME_API IEventReceiver : public IBaseEventReceiver
 public:
     void OnEvent(UObject* EventObject);
 
-    template<typename T> 
+    template<typename T = IEventInterface> 
     void OnEventTyped(T* Event)
     {
         OnEvent(Cast<UObject>(Event));
