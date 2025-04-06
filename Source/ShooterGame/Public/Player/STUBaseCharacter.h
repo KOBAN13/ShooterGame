@@ -43,6 +43,9 @@ private:
 public:
     UFUNCTION(BlueprintCallable, Category = "Movement")
     bool IsRunning() const;
+
+    UFUNCTION(BlueprintCallable, Category = "Movement")
+    float GetAngleWalk() const;
     
     ASTUBaseCharacter(const FObjectInitializer &ObjectInitializer);
 

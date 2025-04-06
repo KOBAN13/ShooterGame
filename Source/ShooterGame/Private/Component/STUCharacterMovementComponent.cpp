@@ -84,17 +84,3 @@ void USTUCharacterMovementComponent::Initialize()
         }
     }
 }
-
-void USTUCharacterMovementComponent::BeginDestroy()
-{
-    if (ServiceLocator)
-    {
-        if (UResourceLoaderService* ResourceLoaderService = nullptr;
-            ServiceLocator->TryGetService(ResourceLoaderService))
-        {
-            ResourceLoaderService->OnCharacterConfigLoaded.RemoveAll(this);
-        }
-    }
-    
-    Super::BeginDestroy();
-}

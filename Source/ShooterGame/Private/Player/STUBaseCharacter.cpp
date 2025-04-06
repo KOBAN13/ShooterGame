@@ -6,6 +6,7 @@
 #include "Camera/CameraComponent.h"
 #include "Components/InputComponent.h"
 #include "GameFramework/SpringArmComponent.h"
+#include "Kismet/KismetMathLibrary.h"
 
 ASTUBaseCharacter::ASTUBaseCharacter(const FObjectInitializer &ObjectInitializer)
 : Super(ObjectInitializer.SetDefaultSubobjectClass<USTUCharacterMovementComponent>(CharacterMovementComponentName))
@@ -20,6 +21,21 @@ ASTUBaseCharacter::ASTUBaseCharacter(const FObjectInitializer &ObjectInitializer
 bool ASTUBaseCharacter::IsRunning() const
 {
     return bIsRun && bIsWalk && !GetVelocity().IsZero();
+}
+
+float ASTUBaseCharacter::GetAngleWalk() const
+{
+    const auto ForwardVector = GetActorForwardVector();
+    const auto Velocity = GetVelocity();
+
+    const auto NormalizeVelocity = UKismetMathLibrary :: Normal(Velocity);
+    const auto DotProduct = UKismetMathLibrary::Dot_VectorVector(NormalizeVelocity, ForwardVector);
+    const auto CrossProduct = UKismetMathLibrary::Cross_VectorVector(NormalizeVelocity, ForwardVector);
+    const auto Angle = UKismetMathLibrary::DegAcos(DotProduct);
+
+    const auto SignAngle = UKismetMathLibrary::SignOfFloat(CrossProduct.Z);
+
+    return Angle * SignAngle;
 }
 
 void ASTUBaseCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
