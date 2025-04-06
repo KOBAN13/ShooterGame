@@ -23,19 +23,22 @@ bool ASTUBaseCharacter::IsRunning() const
     return bIsRun && bIsWalk && !GetVelocity().IsZero();
 }
 
-float ASTUBaseCharacter::GetAngleWalk() const
+float ASTUBaseCharacter::GetWalkDirection() const
 {
-    const auto ForwardVector = GetActorForwardVector();
     const auto Velocity = GetVelocity();
+
+    if(Velocity.IsZero())
+        return 0.0f;
+    
+    const auto ForwardVector = GetActorForwardVector();
 
     const auto NormalizeVelocity = UKismetMathLibrary :: Normal(Velocity);
     const auto DotProduct = UKismetMathLibrary::Dot_VectorVector(NormalizeVelocity, ForwardVector);
     const auto CrossProduct = UKismetMathLibrary::Cross_VectorVector(NormalizeVelocity, ForwardVector);
-    const auto Angle = UKismetMathLibrary::DegAcos(DotProduct);
-
+    const auto AngleBetween = UKismetMathLibrary::DegAcos(DotProduct);
     const auto SignAngle = UKismetMathLibrary::SignOfFloat(CrossProduct.Z);
 
-    return Angle * SignAngle;
+    return CrossProduct.IsZero() ? AngleBetween : AngleBetween * SignAngle;
 }
 
 void ASTUBaseCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
