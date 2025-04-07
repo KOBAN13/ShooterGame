@@ -4,7 +4,6 @@
 
 #include "CoreMinimal.h"
 #include "BaseEventReceiver.h"
-#include "UObject/Interface.h"
 #include "EventReceiver.generated.h"
 
 class IEventInterface;
@@ -20,11 +19,16 @@ class SHOOTERGAME_API IEventReceiver : public IBaseEventReceiver
 	GENERATED_BODY()
 
 public:
-    void OnEvent(UObject* EventObject);
+    virtual void OnEvent(UObject* EventObject);
 
     template<typename T = IEventInterface> 
     void OnEventTyped(T* Event)
     {
         OnEvent(Cast<UObject>(Event));
+    }
+
+    virtual size_t GetHashCode() const __override
+    {
+        return reinterpret_cast<size_t>(this);
     }
 };
