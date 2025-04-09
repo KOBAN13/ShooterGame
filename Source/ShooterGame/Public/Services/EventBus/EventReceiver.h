@@ -22,12 +22,13 @@ class SHOOTERGAME_API IEventReceiver : public IBaseEventReceiver
 public:
     virtual void OnEvent(UObject* EventObject) = 0;
 
-    template<typename T = IEventInterface> 
-    void OnEventTyped(T* Event)
+    template<typename TEvent> 
+    void OnEventTyped(TEvent* Event)
     {
         if(UObject* Object = Cast<UObject>(Event))
         {
-            OnEvent(Object);
+            if(Object -> GetClass() -> ImplementsInterface(TEvent::StaticClass()))
+                OnEvent(Object);
         }
     }
 

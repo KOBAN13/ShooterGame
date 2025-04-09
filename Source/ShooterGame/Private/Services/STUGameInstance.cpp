@@ -5,7 +5,7 @@
 #include "ResourceLoaderService.h"
 #include "TweenService.h"
 #include "ServiceLocatorSubsystem.h"
-
+#include "EventBus/EventBusService.h"
 
 void USTUGameInstance::Init()
 {
@@ -15,6 +15,7 @@ void USTUGameInstance::Init()
 
     ServiceLocatorSubsystem->RegisterService<UTweenService>(UTweenService::StaticClass());
     ServiceLocatorSubsystem->RegisterService<UResourceLoaderService>(UResourceLoaderService::StaticClass());
+    ServiceLocatorSubsystem->RegisterService<UEventBusService>(UEventBusService::StaticClass());
 
     UResourceLoaderService* ResourceLoaderService = nullptr;
     
