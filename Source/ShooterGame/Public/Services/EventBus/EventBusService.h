@@ -3,8 +3,8 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "BaseEventReceiver.h"
 #include "EventReceiver.h"
+#include "EventInterface.h"
 #include "EventBusService.generated.h"
 
 class IEventReceiver;
@@ -16,19 +16,19 @@ class SHOOTERGAME_API UEventBusService : public UObject
 {
     GENERATED_BODY()
 
-    TMap<UObject*, TArray<TWeakObjectPtr<IBaseEventReceiver>>> EventReceivers;
-    TMap<size_t, TWeakObjectPtr<IBaseEventReceiver>> EventReceiverHashToReference;
+    TMap<TWeakObjectPtr<>, TArray<TWeakObjectPtr<>>> EventReceivers;
+    TMap<size_t, TWeakObjectPtr<>> EventReceiverHashToReference;
 
     UEventBusService();
     
     void AddEventReceiver(IEventReceiver* EventReceiver)
     {
-        const UObject* Object = Cast<UObject>(EventReceiver);
+        UObject* Object = Cast<UObject>(EventReceiver);
         
         if (!EventReceivers.Contains(Object))
-            EventReceivers[Object] = TArray<TWeakObjectPtr<IBaseEventReceiver>>();
+            EventReceivers[Object] = TArray<TWeakObjectPtr<>>();
 
-        const auto Reference = TWeakObjectPtr<IBaseEventReceiver>(EventReceiver);
+        const TWeakObjectPtr<> Reference = TWeakObjectPtr<>(Object);
 
         EventReceivers[Object].Add(Reference);
         EventReceiverHashToReference.Add(EventReceiver -> GetHashCode(), Reference);
@@ -60,7 +60,15 @@ class SHOOTERGAME_API UEventBusService : public UObject
             if(Receiver.IsValid())
             {
                 auto* EventReceiver = Receiver.Get();
-                Cast<IEventReceiver>(EventReceiver) -> OnEventTyped(EventObject);
+
+                if(IEventReceiver* CastedReceiver = Cast<IEventReceiver>(EventReceiver))
+                {
+                    CastedReceiver -> OnEventTyped(EventObject);
+                }
+                else
+                {
+                    UE_LOG(LogTemp, Error, TEXT("EventReceiver is not IEventReceiver"));
+                }
             }
         }
     }

@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "BaseEventReceiver.h"
+#include "EventInterface.h"
 #include "EventReceiver.generated.h"
 
 class IEventInterface;
@@ -24,7 +25,7 @@ public:
     template<typename T = IEventInterface> 
     void OnEventTyped(T* Event)
     {
-        if(UObject* Object = Cast<T>(Event))
+        if(UObject* Object = Cast<UObject>(Event))
         {
             OnEvent(Object);
         }

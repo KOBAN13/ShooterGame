@@ -4,6 +4,6 @@
 
 UEventBusService::UEventBusService()
 {
-    EventReceivers = TMap<UObject*, TArray<TWeakObjectPtr<IBaseEventReceiver>>>();
-    EventReceiverHashToReference = TMap<size_t, TWeakObjectPtr<IBaseEventReceiver>>();
+    EventReceivers = TMap<TWeakObjectPtr<>, TArray<TWeakObjectPtr<>>>();
+    EventReceiverHashToReference = TMap<size_t, TWeakObjectPtr<>>();
 }
