@@ -12,6 +12,7 @@ class IBaseEventReceiver;
 USTRUCT()
 struct FCallbackWithPriority
 {
+    GENERATED_BODY()
     int32 Priority;
     
     DECLARE_DELEGATE(FGenericDelegate);
@@ -28,6 +29,8 @@ struct FCallbackWithPriority
 
         return Hash;
     }
+
+    virtual ~FCallbackWithPriority() = default;
 };
 
 UCLASS()
@@ -70,7 +73,7 @@ class SHOOTERGAME_API UEventBusService : public UObject
 
         if(!EventReceivers.Contains(EventName))
         {
-            UE_LOG(LogTemp, Error, TEXT("%s not found", *EventName.ToString()));
+            UE_LOG(LogTemp, Error, TEXT("Event %s not found"), *EventName.ToString());
             return;
         }
         
