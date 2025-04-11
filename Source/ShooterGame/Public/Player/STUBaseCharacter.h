@@ -7,13 +7,14 @@
 #include "GameFramework/Character.h"
 #include "STUBaseCharacter.generated.h"
 
-class USTUCharacterMovementComponent;
 DEFINE_LOG_CATEGORY_STATIC(CharacterLogs, All, All);
 
 class UCharacterConfig;
 class UCameraComponent;
 class USpringArmComponent;
 class UServiceLocatorSubsystem;
+class UEventBusService;
+class USTUCharacterMovementComponent;
 
 UCLASS()
 class SHOOTERGAME_API ASTUBaseCharacter : public ACharacter
@@ -36,6 +37,9 @@ public:
     UPROPERTY()
     UServiceLocatorSubsystem* ServiceLocator;
 
+    UPROPERTY()
+    UEventBusService* EventBus;
+    
 private:
     bool bIsWalk = false;
     bool bIsRun = false;

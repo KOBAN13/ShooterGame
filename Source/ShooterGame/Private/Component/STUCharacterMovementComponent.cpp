@@ -8,6 +8,7 @@
 #include "STUGameInstance.h"
 #include "ServiceLocatorSubsystem.h"
 #include "TweenService.h"
+#include "EventBus/EventBusService.h"
 
 void USTUCharacterMovementComponent::InitializeComponent()
 {
@@ -15,7 +16,7 @@ void USTUCharacterMovementComponent::InitializeComponent()
     Initialize();
 }
 
-void USTUCharacterMovementComponent::RunStart()
+void USTUCharacterMovementComponent::RunStart(USTUCharacterMovementComponent* Component)
 {
     UTweenService* TweenService = nullptr;
     
@@ -34,7 +35,7 @@ void USTUCharacterMovementComponent::RunStart()
     }
 }
 
-void USTUCharacterMovementComponent::RunEnd()
+void USTUCharacterMovementComponent::RunEnd(USTUCharacterMovementComponent* Component)
 {
     UTweenService* TweenService = nullptr;
 
@@ -42,12 +43,8 @@ void USTUCharacterMovementComponent::RunEnd()
     {
         TweenService->TweenKill(IdTweenRunEnd);
         IdTweenRunEnd = TweenService->TweenFloat(
-            CharacterConfig -> MaxSpeed, CharacterConfig->MaxSpeed, CharacterConfig->TimeInterpolation,
-            [this](float Speed)
-            {
-                MaxWalkSpeed = Speed;
-            },
-            []() { GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Red, TEXT("RunEnd")); });
+            CharacterConfig->MaxSpeed, CharacterConfig->MaxSpeed, CharacterConfig->TimeInterpolation, [this](float Speed)
+            { MaxWalkSpeed = Speed; }, []() { GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Red, TEXT("RunEnd")); });
     }
 }
 
@@ -82,5 +79,21 @@ void USTUCharacterMovementComponent::Initialize()
                 ResourceLoaderService->OnCharacterConfigLoaded.AddUObject(this, &USTUCharacterMovementComponent::OnCharacterConfigLoaded);
             }
         }
-    }
+    } 
+
+    UEventBusService* EventBus = nullptr;
+    ServiceLocator -> TryGetService(EventBus);
+
+    check(EventBus != nullptr);
+
+    EventBus -> Subscribe<USTUCharacterMovementComponent>(1, [this](USTUCharacterMovementComponent* Component)
+    {
+        Component -> RunStart(Component);
+    });
+
+    EventBus -> Subscribe<USTUCharacterMovementComponent>(2, [this](USTUCharacterMovementComponent* Component)
+    {
+        Component -> RunEnd(Component);
+    });
 }
+   

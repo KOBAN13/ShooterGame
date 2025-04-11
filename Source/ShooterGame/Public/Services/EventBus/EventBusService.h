@@ -15,7 +15,7 @@ struct FCallbackWithPriority
     GENERATED_BODY()
     int32 Priority;
     
-    DECLARE_DELEGATE(FGenericDelegate);
+    DECLARE_DELEGATE_OneParam(FGenericDelegate, UObject*);
     FGenericDelegate Delegate;
 
     virtual size_t GetHashCode() const
@@ -38,36 +38,52 @@ class SHOOTERGAME_API UEventBusService : public UObject
 {
     GENERATED_BODY()
 
-    TMap<FName, TArray<TWeakObjectPtr<FCallbackWithPriority>>> EventReceivers;
-    TMap<size_t, TWeakObjectPtr<FCallbackWithPriority>> EventReceiverHashToReference;
+    TMap<FName, TArray<TSharedPtr<FCallbackWithPriority>>> EventReceivers;
+    TMap<size_t, TSharedPtr<FCallbackWithPriority>> EventReceiverHashToReference;
 
     UEventBusService();
 
+public:
     template<typename TEvent = UObject>
-    void AddEventReceiver(int32 priority, TFunction<void(TEvent)> Callback)
+    void Subscribe(const int32 Priority, const TFunction<void(TEvent*)>& Callback)
     {
         const FName EventName = TEvent::StaticClass() -> GetFName();
         
         if (!EventReceivers.Contains(EventName))
-            EventReceivers[EventName] = TArray<TWeakObjectPtr<FCallbackWithPriority>>();
+            EventReceivers[EventName] = TArray<TSharedPtr<FCallbackWithPriority>>();
 
         auto* EventReceiver = new FCallbackWithPriority();
-        EventReceiver -> Priority = priority;
-        EventReceiver -> Delegate.BindLambda(Callback);
+        EventReceiver -> Priority = Priority;
+
+        auto WrapperLambda = [Callback](UObject* Obj) //в метод и разобратся
+        {
+            if (TEvent* TypedObj = Cast<TEvent>(Obj))
+            {
+                Callback(TypedObj);
+            }
+            else
+            {
+                UE_LOG(LogTemp, Error, TEXT("Type mismatch in delegate callback!"));
+            }
+        };
         
-        const TWeakObjectPtr<FCallbackWithPriority> Receiver = TWeakObjectPtr(EventReceiver);
+        EventReceiver -> Delegate.BindLambda(WrapperLambda);
+
+        const TSharedPtr<FCallbackWithPriority> Receiver =
+            MakeShared<FCallbackWithPriority>();
 
         EventReceivers[EventName].Add(Receiver);
         EventReceiverHashToReference.Add(EventReceiver -> GetHashCode(), Receiver);
 
-        EventReceivers[EventName].Sort([](const TWeakObjectPtr<FCallbackWithPriority>& A, const TWeakObjectPtr<FCallbackWithPriority>& B)
+        EventReceivers[EventName].Sort([](const TSharedPtr<FCallbackWithPriority>& A,
+            const TSharedPtr<FCallbackWithPriority>& B)
         {
-            A.Get() -> Priority > B.Get() -> Priority;
+            return A.Get() -> Priority > B.Get() -> Priority;
         });
     }
 
     template<typename TEvent = UObject>
-    void RemoveEventReceiver(TFunction<void(TEvent)> Callback)
+    void Unsubscribe(const TFunction<void(TEvent*)>& Callback)
     {
         const FName EventName = TEvent::StaticClass() -> GetFName();
 
@@ -78,7 +94,7 @@ class SHOOTERGAME_API UEventBusService : public UObject
         }
         
         const size_t Hash = EventReceivers[EventName]
-        .FindByPredicate([Callback](const TWeakObjectPtr<FCallbackWithPriority>& Receiver)
+        .FindByPredicate([Callback](const TSharedPtr<FCallbackWithPriority>& Receiver)
         -> bool
         {
             return Receiver.Get() -> Delegate.GetUObject() == Callback.GetUObject();
@@ -104,7 +120,13 @@ class SHOOTERGAME_API UEventBusService : public UObject
             {
                 auto* EventReceiver = Receiver.Get();
 
-                EventReceiver -> Delegate.Execute(EventObject);
+                if(!EventReceiver -> Delegate.IsBound())
+                    continue;
+
+                if(auto* Object = Cast<UObject>(EventObject))
+                {
+                    EventReceiver -> Delegate.ExecuteIfBound(Object);
+                }
             }
         }
     }

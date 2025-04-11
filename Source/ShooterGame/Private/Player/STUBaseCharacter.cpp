@@ -3,8 +3,10 @@
 #include "STUBaseCharacter.h"
 
 #include "STUCharacterMovementComponent.h"
+#include "ServiceLocatorSubsystem.h"
 #include "Camera/CameraComponent.h"
 #include "Components/InputComponent.h"
+#include "EventBus/EventBusService.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "Kismet/KismetMathLibrary.h"
 
@@ -16,6 +18,10 @@ ASTUBaseCharacter::ASTUBaseCharacter(const FObjectInitializer &ObjectInitializer
     STUCharacterMovementComponent = Cast<USTUCharacterMovementComponent>(GetCharacterMovement());
     
     CreateComponentsAndAttach();
+    
+    ServiceLocator -> TryGetService(EventBus);
+
+    check(EventBus != nullptr);
 }
 
 bool ASTUBaseCharacter::IsRunning() const
@@ -97,12 +103,12 @@ void ASTUBaseCharacter::RunStart()
 {
     bIsRun = true;
 
-    STUCharacterMovementComponent -> RunStart();
+    EventBus -> SendEvent(STUCharacterMovementComponent);
 }
 
 void ASTUBaseCharacter::RunEnd()
 {
     bIsRun = false;
 
-    STUCharacterMovementComponent -> RunEnd();
+    EventBus -> SendEvent(STUCharacterMovementComponent);
 }
