@@ -2,6 +2,7 @@
 
 #include "STUBaseCharacter.h"
 
+#include "EventNameConstants.h"
 #include "STUCharacterMovementComponent.h"
 #include "STUGameInstance.h"
 #include "ServiceLocatorSubsystem.h"
@@ -115,12 +116,12 @@ void ASTUBaseCharacter::RunStart()
 {
     bIsRun = true;
 
-    EventBus -> SendEvent(STUCharacterMovementComponent);
+    EventBus -> SendEvent(EventNameConstants::OnStartRun, STUCharacterMovementComponent);
 }
 
 void ASTUBaseCharacter::RunEnd()
 {
     bIsRun = false;
 
-    EventBus -> SendEvent(STUCharacterMovementComponent);
+    EventBus -> SendEvent(EventNameConstants::OnStopRun, STUCharacterMovementComponent);
 }

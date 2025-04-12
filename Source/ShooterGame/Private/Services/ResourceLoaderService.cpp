@@ -11,7 +11,7 @@ UResourceLoaderService::UResourceLoaderService()
 
 void UResourceLoaderService::LoadResources()
 {
-    const FSoftObjectPath ConfigPath(ConstantsLoad::CharacterConfig);
+    const FSoftObjectPath ConfigPath(ConstantsLoader::CharacterConfig);
 
     if(!ConfigPath.IsValid())
     {
@@ -19,7 +19,7 @@ void UResourceLoaderService::LoadResources()
         return;
     }
 
-    if (ResourceMap.Contains(ConstantsLoad::CharacterConfig))
+    if (ResourceMap.Contains(ConstantsLoader::CharacterConfig))
         return;
 
     
@@ -29,7 +29,7 @@ void UResourceLoaderService::LoadResources()
                                                            {
                                                                if (UDataAsset* Config = Cast<UDataAsset>(ConfigPath.TryLoad()))
                                                                {
-                                                                   ResourceMap.Add(ConstantsLoad::CharacterConfig, Config);
+                                                                   ResourceMap.Add(ConstantsLoader::CharacterConfig, Config);
                                                                    OnCharacterConfigLoaded.Broadcast();
                                                                    UE_LOG(LogTemp, Warning, TEXT("Loaded Character Config"));
                                                                }

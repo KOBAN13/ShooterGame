@@ -88,10 +88,8 @@ public:
     }
 
     template<typename TEvent = UObject>
-    void SendEvent(TEvent EventObject)
+    void SendEvent(const FName EventName, TEvent EventObject)
     {
-        const FName EventName = TEvent::StaticClass() -> GetFName();
-
         if(!EventReceivers.Contains(EventName))
             return;
         
