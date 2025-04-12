@@ -3,6 +3,7 @@
 #include "STUBaseCharacter.h"
 
 #include "STUCharacterMovementComponent.h"
+#include "STUGameInstance.h"
 #include "ServiceLocatorSubsystem.h"
 #include "Camera/CameraComponent.h"
 #include "Components/InputComponent.h"
@@ -18,10 +19,21 @@ ASTUBaseCharacter::ASTUBaseCharacter(const FObjectInitializer &ObjectInitializer
     STUCharacterMovementComponent = Cast<USTUCharacterMovementComponent>(GetCharacterMovement());
     
     CreateComponentsAndAttach();
-    
-    ServiceLocator -> TryGetService(EventBus);
 
-    check(EventBus != nullptr);
+    if (const auto* World = GetWorld())
+    {
+        if (const auto* GameInstance = Cast<USTUGameInstance>(World -> GetGameInstance()))
+        {
+            const auto* ServiceLocator = GameInstance->GetServiceLocator();
+
+            EventBus = nullptr;
+
+            if(ServiceLocator -> TryGetService(EventBus))
+            {
+                check(EventBus != nullptr);
+            }
+        }
+    } 
 }
 
 bool ASTUBaseCharacter::IsRunning() const

@@ -78,22 +78,22 @@ void USTUCharacterMovementComponent::Initialize()
             {
                 ResourceLoaderService->OnCharacterConfigLoaded.AddUObject(this, &USTUCharacterMovementComponent::OnCharacterConfigLoaded);
             }
+
+            UEventBusService* EventBus = nullptr;
+            ServiceLocator -> TryGetService(EventBus);
+
+            check(EventBus != nullptr);
+
+            EventBus -> Subscribe<USTUCharacterMovementComponent>(1, [this](USTUCharacterMovementComponent* Component)
+            {
+                Component -> RunStart(Component);
+            });
+
+            EventBus -> Subscribe<USTUCharacterMovementComponent>(2, [this](USTUCharacterMovementComponent* Component)
+            {
+                Component -> RunEnd(Component);
+            });
         }
     } 
-
-    UEventBusService* EventBus = nullptr;
-    ServiceLocator -> TryGetService(EventBus);
-
-    check(EventBus != nullptr);
-
-    EventBus -> Subscribe<USTUCharacterMovementComponent>(1, [this](USTUCharacterMovementComponent* Component)
-    {
-        Component -> RunStart(Component);
-    });
-
-    EventBus -> Subscribe<USTUCharacterMovementComponent>(2, [this](USTUCharacterMovementComponent* Component)
-    {
-        Component -> RunEnd(Component);
-    });
 }
    

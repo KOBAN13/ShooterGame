@@ -48,34 +48,19 @@ public:
     void Subscribe(const int32 Priority, const TFunction<void(TEvent*)>& Callback)
     {
         const FName EventName = TEvent::StaticClass() -> GetFName();
-        
-        if (!EventReceivers.Contains(EventName))
-            EventReceivers[EventName] = TArray<TSharedPtr<FCallbackWithPriority>>();
 
-        auto* EventReceiver = new FCallbackWithPriority();
+        TArray<TSharedPtr<FCallbackWithPriority>>& Receivers = EventReceivers.FindOrAdd(EventName);
+
+        const TSharedPtr<FCallbackWithPriority> EventReceiver = MakeShared<FCallbackWithPriority>();
+        
         EventReceiver -> Priority = Priority;
 
-        auto WrapperLambda = [Callback](UObject* Obj) //в метод и разобратся
-        {
-            if (TEvent* TypedObj = Cast<TEvent>(Obj))
-            {
-                Callback(TypedObj);
-            }
-            else
-            {
-                UE_LOG(LogTemp, Error, TEXT("Type mismatch in delegate callback!"));
-            }
-        };
-        
-        EventReceiver -> Delegate.BindLambda(WrapperLambda);
+        ConvertAndBind(Callback, EventReceiver);
 
-        const TSharedPtr<FCallbackWithPriority> Receiver =
-            MakeShared<FCallbackWithPriority>();
+        Receivers.Add(EventReceiver);
+        EventReceiverHashToReference.Add(EventReceiver -> GetHashCode(), EventReceiver);
 
-        EventReceivers[EventName].Add(Receiver);
-        EventReceiverHashToReference.Add(EventReceiver -> GetHashCode(), Receiver);
-
-        EventReceivers[EventName].Sort([](const TSharedPtr<FCallbackWithPriority>& A,
+        Receivers.Sort([](const TSharedPtr<FCallbackWithPriority>& A,
             const TSharedPtr<FCallbackWithPriority>& B)
         {
             return A.Get() -> Priority > B.Get() -> Priority;
@@ -109,7 +94,7 @@ public:
     template<typename TEvent = UObject>
     void SendEvent(TEvent EventObject)
     {
-        const FName EventName = EventObject -> GetFName();
+        const FName EventName = TEvent::StaticClass() -> GetFName();
 
         if(!EventReceivers.Contains(EventName))
             return;
@@ -129,5 +114,24 @@ public:
                 }
             }
         }
+    }
+
+    template<typename TEvent>
+    void ConvertAndBind(const TFunction<void(TEvent*)>& Callback,
+        const TSharedPtr<FCallbackWithPriority> EventReceiver)
+    {
+        auto WrapperLambda = [Callback](UObject* Obj)
+        {
+            if(TEvent* TypedObj = Cast<TEvent>(Obj))
+            {
+                Callback(TypedObj);
+            }
+            else
+            {
+                UE_LOG(LogTemp, Error, TEXT("Type mismatch in delegate callback!"));
+            }
+        };
+        
+        EventReceiver -> Delegate.BindLambda(WrapperLambda);
     }
 };

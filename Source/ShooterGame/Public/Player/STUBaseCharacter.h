@@ -35,9 +35,6 @@ public:
     UCharacterConfig* CharacterConfig;
 
     UPROPERTY()
-    UServiceLocatorSubsystem* ServiceLocator;
-
-    UPROPERTY()
     UEventBusService* EventBus;
     
 private:
