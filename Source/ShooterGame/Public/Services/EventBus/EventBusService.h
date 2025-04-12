@@ -15,16 +15,24 @@ struct FCallbackWithPriority
     GENERATED_BODY()
     int32 Priority;
     
-    DECLARE_DELEGATE_OneParam(FGenericDelegate, UObject*);
-    FGenericDelegate Delegate;
+    DECLARE_DELEGATE_OneParam(FGenericDelegateOneParam, UObject*);
+    FGenericDelegateOneParam OneParamDelegate;
+
+    DECLARE_DELEGATE(FGenericDelegate);
+    FGenericDelegate SimpleDelegate;
 
     virtual size_t GetHashCode() const
     {
         size_t Hash = GetTypeHash(Priority);
 
-        if (Delegate.IsBound())
+        if (SimpleDelegate.IsBound())
         {
-            Hash = HashCombine(Hash, GetTypeHash(Delegate.GetUObject()));
+            Hash = HashCombine(Hash, GetTypeHash(SimpleDelegate.GetUObject()));
+        }
+
+        if(OneParamDelegate.IsBound())
+        {
+            Hash = HashCombine(Hash, GetTypeHash(OneParamDelegate.GetUObject()));
         }
 
         return Hash;
@@ -47,22 +55,12 @@ public:
     template<typename TEvent = UObject>
     void Subscribe(const FName EventName, const int32 Priority, const TFunction<void(TEvent*)>& Callback)
     {
-        TArray<TSharedPtr<FCallbackWithPriority>>& Receivers = EventReceivers.FindOrAdd(EventName);
-
-        const TSharedPtr<FCallbackWithPriority> EventReceiver = MakeShared<FCallbackWithPriority>();
-        
-        EventReceiver -> Priority = Priority;
-
-        ConvertAndBind(Callback, EventReceiver);
-
-        Receivers.Add(EventReceiver);
-        EventReceiverHashToReference.Add(EventReceiver -> GetHashCode(), EventReceiver);
-
-        Receivers.Sort([](const TSharedPtr<FCallbackWithPriority>& A,
-            const TSharedPtr<FCallbackWithPriority>& B)
-        {
-            return A.Get() -> Priority > B.Get() -> Priority;
-        });
+        AddReceiver<TEvent>(EventName, Priority, Callback);
+    }
+    
+    void Subscribe(const FName EventName, const int32 Priority, const TFunction<void()>& Callback)
+    {
+        AddReceiver(EventName, Priority, Callback);
     }
 
     template<typename TEvent = UObject>
@@ -78,7 +76,7 @@ public:
         .FindByPredicate([Callback](const TSharedPtr<FCallbackWithPriority>& Receiver)
         -> bool
         {
-            return Receiver.Get() -> Delegate.GetUObject() == Callback.GetUObject();
+            return Receiver.Get() -> SimpleDelegate.GetUObject() == Callback.GetUObject();
         });
         
         auto const Reference = EventReceiverHashToReference[Hash];
@@ -99,34 +97,89 @@ public:
             {
                 auto* EventReceiver = Receiver.Get();
 
-                if(!EventReceiver -> Delegate.IsBound())
+                if(!EventReceiver -> OneParamDelegate.IsBound())
                     continue;
 
                 if(auto* Object = Cast<UObject>(EventObject))
                 {
-                    EventReceiver -> Delegate.ExecuteIfBound(Object);
+                    EventReceiver -> OneParamDelegate.ExecuteIfBound(Object);
                 }
             }
         }
     }
 
-private:
-    template<typename TEvent>
-    void ConvertAndBind(const TFunction<void(TEvent*)>& Callback,
-        const TSharedPtr<FCallbackWithPriority> EventReceiver)
+    void SendEvent(const FName EventName)
     {
-        auto WrapperLambda = [Callback](UObject* Obj)
-        {
-            if(TEvent* TypedObj = Cast<TEvent>(Obj))
-            {
-                Callback(TypedObj);
-            }
-            else
-            {
-                UE_LOG(LogTemp, Error, TEXT("Type mismatch in delegate callback!"));
-            }
-        };
+        if(!EventReceivers.Contains(EventName))
+            return;
         
-        EventReceiver -> Delegate.BindLambda(WrapperLambda);
+        for(const auto& Receiver : EventReceivers[EventName])
+        {
+            if(Receiver.IsValid())
+            {
+                const auto* EventReceiver = Receiver.Get();
+
+                if(!EventReceiver -> OneParamDelegate.IsBound())
+                    continue;
+
+                EventReceiver -> SimpleDelegate.ExecuteIfBound();
+            }
+        }
+    }
+
+private:
+    template<typename TCallback>
+    void ConvertAndBind(const TCallback& Callback, const TSharedPtr<FCallbackWithPriority> EventReceiver)
+    {
+        if constexpr(std::is_invocable_v<TCallback> && !std::is_invocable_v<TCallback, UObject*>)
+        {
+            EventReceiver -> SimpleDelegate.BindLambda([Callback]() { Callback(); });
+        }
+
+        else if constexpr(std::is_invocable_v<TCallback, UObject*>)
+        {
+            EventReceiver->OneParamDelegate.BindLambda([Callback](UObject* Obj)
+            {
+                if constexpr(std::is_same_v<TCallback, TFunction<void(UObject*)>>)
+                {
+                    Callback(Obj);
+                }
+                else
+                {
+                    using TEvent = std::remove_pointer_t<std::decay_t<decltype(Obj)>>;
+                    if(TEvent* TypedObj = Cast<TEvent>(Obj))
+                    {
+                        Callback(TypedObj);
+                    }
+                    else
+                    {
+                        UE_LOG(LogTemp, Error, TEXT("Type mismatch in delegate callback! Expected %s, got %s"),
+                            *TEvent::StaticClass()->GetName(),
+                            *Obj->GetClass()->GetName());
+                    }
+                }
+            });
+        }
+    }
+
+    template<typename TCallback>
+    void AddReceiver(const FName EventName, const int32 Priority, const TCallback& Callback)
+    {
+        TArray<TSharedPtr<FCallbackWithPriority>>& Receivers = EventReceivers.FindOrAdd(EventName);
+
+        const TSharedPtr<FCallbackWithPriority> EventReceiver = MakeShared<FCallbackWithPriority>();
+        
+        EventReceiver -> Priority = Priority;
+
+        ConvertAndBind(Callback, EventReceiver);
+
+        Receivers.Add(EventReceiver);
+        EventReceiverHashToReference.Add(EventReceiver -> GetHashCode(), EventReceiver);
+
+        Receivers.Sort([](const TSharedPtr<FCallbackWithPriority>& A,
+            const TSharedPtr<FCallbackWithPriority>& B)
+        {
+            return A.Get() -> Priority > B.Get() -> Priority;
+        });
     }
 };

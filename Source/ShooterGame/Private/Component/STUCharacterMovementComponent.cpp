@@ -17,7 +17,7 @@ void USTUCharacterMovementComponent::InitializeComponent()
     Initialize();
 }
 
-void USTUCharacterMovementComponent::RunStart(USTUCharacterMovementComponent* Component)
+void USTUCharacterMovementComponent::RunStart()
 {
     UTweenService* TweenService = nullptr;
     
@@ -36,7 +36,7 @@ void USTUCharacterMovementComponent::RunStart(USTUCharacterMovementComponent* Co
     }
 }
 
-void USTUCharacterMovementComponent::RunEnd(USTUCharacterMovementComponent* Component)
+void USTUCharacterMovementComponent::RunEnd()
 {
     UTweenService* TweenService = nullptr;
 
@@ -85,20 +85,20 @@ void USTUCharacterMovementComponent::Initialize()
 
             check(EventBus != nullptr);
 
-            EventBus -> Subscribe<USTUCharacterMovementComponent>(
+            EventBus -> Subscribe(
                 EventNameConstants::OnStartRun,
                 1,
-                [this](USTUCharacterMovementComponent* Component)
+                [this]()
             {
-                Component -> RunStart(Component);
+                RunStart();
             });
 
-            EventBus -> Subscribe<USTUCharacterMovementComponent>(
+            EventBus -> Subscribe(
                 EventNameConstants::OnStopRun,
                 2,
-                [this](USTUCharacterMovementComponent* Component)
+                [this]
             {
-                Component -> RunEnd(Component);
+                RunEnd();
             });
         }
     } 

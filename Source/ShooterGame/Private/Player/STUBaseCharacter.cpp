@@ -116,12 +116,12 @@ void ASTUBaseCharacter::RunStart()
 {
     bIsRun = true;
 
-    EventBus -> SendEvent(EventNameConstants::OnStartRun, STUCharacterMovementComponent);
+    EventBus -> SendEvent(EventNameConstants::OnStartRun);
 }
 
 void ASTUBaseCharacter::RunEnd()
 {
     bIsRun = false;
 
-    EventBus -> SendEvent(EventNameConstants::OnStopRun, STUCharacterMovementComponent);
+    EventBus -> SendEvent(EventNameConstants::OnStopRun);
 }
