@@ -45,10 +45,8 @@ class SHOOTERGAME_API UEventBusService : public UObject
 
 public:
     template<typename TEvent = UObject>
-    void Subscribe(const int32 Priority, const TFunction<void(TEvent*)>& Callback)
+    void Subscribe(const FName EventName, const int32 Priority, const TFunction<void(TEvent*)>& Callback)
     {
-        const FName EventName = TEvent::StaticClass() -> GetFName();
-
         TArray<TSharedPtr<FCallbackWithPriority>>& Receivers = EventReceivers.FindOrAdd(EventName);
 
         const TSharedPtr<FCallbackWithPriority> EventReceiver = MakeShared<FCallbackWithPriority>();
@@ -68,10 +66,8 @@ public:
     }
 
     template<typename TEvent = UObject>
-    void Unsubscribe(const TFunction<void(TEvent*)>& Callback)
+    void Unsubscribe(const FName EventName, const TFunction<void(TEvent*)>& Callback)
     {
-        const FName EventName = TEvent::StaticClass() -> GetFName();
-
         if(!EventReceivers.Contains(EventName))
         {
             UE_LOG(LogTemp, Error, TEXT("Event %s not found"), *EventName.ToString());
@@ -116,6 +112,7 @@ public:
         }
     }
 
+private:
     template<typename TEvent>
     void ConvertAndBind(const TFunction<void(TEvent*)>& Callback,
         const TSharedPtr<FCallbackWithPriority> EventReceiver)

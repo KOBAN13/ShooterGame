@@ -4,7 +4,7 @@
 
 #include "CoreMinimal.h"
 
-namespace Constants
+namespace ConstantsLoader
 {
     static const FName CharacterConfig(TEXT("/Game/Configs/DA_CharacterConfig.DA_CharacterConfig"));
 }

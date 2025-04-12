@@ -3,7 +3,8 @@
 #include "STUCharacterMovementComponent.h"
 
 #include "CharacterConfig.h"
-#include "Constants.h"
+#include "ConstantsLoader.h"
+#include "EventNameConstants.h"
 #include "ResourceLoaderService.h"
 #include "STUGameInstance.h"
 #include "ServiceLocatorSubsystem.h"
@@ -55,7 +56,7 @@ void USTUCharacterMovementComponent::OnCharacterConfigLoaded()
     if(ServiceLocator -> TryGetService(ResourceLoaderService))
     {
         UDataAsset* DataAsset = ResourceLoaderService
-            -> GetResource(Constants::CharacterConfig);
+            -> GetResource(ConstantsLoader::CharacterConfig);
 
         check(DataAsset->IsValidLowLevel())
 
@@ -84,12 +85,18 @@ void USTUCharacterMovementComponent::Initialize()
 
             check(EventBus != nullptr);
 
-            EventBus -> Subscribe<USTUCharacterMovementComponent>(1, [this](USTUCharacterMovementComponent* Component)
+            EventBus -> Subscribe<USTUCharacterMovementComponent>(
+                EventNameConstants::OnStartRun,
+                1,
+                [this](USTUCharacterMovementComponent* Component)
             {
                 Component -> RunStart(Component);
             });
 
-            EventBus -> Subscribe<USTUCharacterMovementComponent>(2, [this](USTUCharacterMovementComponent* Component)
+            EventBus -> Subscribe<USTUCharacterMovementComponent>(
+                EventNameConstants::OnStopRun,
+                2,
+                [this](USTUCharacterMovementComponent* Component)
             {
                 Component -> RunEnd(Component);
             });

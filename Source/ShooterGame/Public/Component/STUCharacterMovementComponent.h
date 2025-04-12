@@ -30,7 +30,4 @@ class SHOOTERGAME_API USTUCharacterMovementComponent : public UCharacterMovement
     
     void RunStart(USTUCharacterMovementComponent* Component);
     void RunEnd(USTUCharacterMovementComponent* Component);
-    
-public:
-    void HandleMovementEvent(UObject* MovementEvent);
 };

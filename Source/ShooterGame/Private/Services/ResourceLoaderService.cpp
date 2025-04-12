@@ -2,7 +2,7 @@
 
 #include "ResourceLoaderService.h"
 #include "Engine/StreamableManager.h"
-#include "Constants.h"
+#include "ConstantsLoader.h"
 
 UResourceLoaderService::UResourceLoaderService()
 {
@@ -11,7 +11,7 @@ UResourceLoaderService::UResourceLoaderService()
 
 void UResourceLoaderService::LoadResources()
 {
-    const FSoftObjectPath ConfigPath(Constants::CharacterConfig);
+    const FSoftObjectPath ConfigPath(ConstantsLoad::CharacterConfig);
 
     if(!ConfigPath.IsValid())
     {
@@ -19,7 +19,7 @@ void UResourceLoaderService::LoadResources()
         return;
     }
 
-    if (ResourceMap.Contains(Constants::CharacterConfig))
+    if (ResourceMap.Contains(ConstantsLoad::CharacterConfig))
         return;
 
     
@@ -29,7 +29,7 @@ void UResourceLoaderService::LoadResources()
                                                            {
                                                                if (UDataAsset* Config = Cast<UDataAsset>(ConfigPath.TryLoad()))
                                                                {
-                                                                   ResourceMap.Add(Constants::CharacterConfig, Config);
+                                                                   ResourceMap.Add(ConstantsLoad::CharacterConfig, Config);
                                                                    OnCharacterConfigLoaded.Broadcast();
                                                                    UE_LOG(LogTemp, Warning, TEXT("Loaded Character Config"));
                                                                }
