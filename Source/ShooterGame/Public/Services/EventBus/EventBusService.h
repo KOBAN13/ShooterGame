@@ -12,7 +12,7 @@ class IBaseEventReceiver;
 USTRUCT()
 struct FCallbackWithPriority
 {
-    GENERATED_BODY()
+    GENERATED_USTRUCT_BODY()
     int32 Priority;
     
     DECLARE_DELEGATE_OneParam(FGenericDelegateOneParam, UObject*);
