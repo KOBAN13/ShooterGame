@@ -58,7 +58,7 @@ void USTUCharacterMovementComponent::OnCharacterConfigLoaded()
         UDataAsset* DataAsset = ResourceLoaderService
             -> GetResource(ConstantsLoader::CharacterConfig);
 
-        check(DataAsset->IsValidLowLevel())
+        check(DataAsset)
 
         CharacterConfig = Cast<UCharacterConfig>(DataAsset);
         MaxWalkSpeed = CharacterConfig -> MaxSpeed;
@@ -83,7 +83,7 @@ void USTUCharacterMovementComponent::Initialize()
             UEventBusService* EventBus = nullptr;
             ServiceLocator -> TryGetService(EventBus);
 
-            check(EventBus != nullptr);
+            check(EventBus);
 
             EventBus -> Subscribe(
                 EventNameConstants::OnStartRun,

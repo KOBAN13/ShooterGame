@@ -7,8 +7,8 @@
 #include "GameFramework/Character.h"
 #include "STUBaseCharacter.generated.h"
 
-DEFINE_LOG_CATEGORY_STATIC(CharacterLogs, All, All);
-
+class UTextRenderComponent;
+class USTUHealthComponent;
 class UCharacterConfig;
 class UCameraComponent;
 class USpringArmComponent;
@@ -28,8 +28,14 @@ public:
     UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Components")
     USpringArmComponent* SpringArmComponent;
 
-    UPROPERTY()
-    USTUCharacterMovementComponent* STUCharacterMovementComponent;
+    UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Components")
+    USTUCharacterMovementComponent* CharacterMovementComponent;
+
+    UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Components")
+    USTUHealthComponent* HealthComponent;
+
+    UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Components")
+    UTextRenderComponent* HealthTextComponent;
 
     UPROPERTY()
     UCharacterConfig* CharacterConfig;
@@ -51,6 +57,8 @@ public:
     ASTUBaseCharacter(const FObjectInitializer &ObjectInitializer);
 
     virtual void SetupPlayerInputComponent(UInputComponent* PlayerInputComponent) override;
+    virtual void Tick(float DeltaSeconds) override;
+    virtual void BeginPlay() override; 
 
 private:
     void MoveForward(float Amount);

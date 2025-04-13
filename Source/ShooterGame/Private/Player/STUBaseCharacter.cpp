@@ -11,13 +11,19 @@
 #include "EventBus/EventBusService.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "Kismet/KismetMathLibrary.h"
+#include "STUHealthComponent.h"
+#include "Components/TextRenderComponent.h"
+#include "Engine/DamageEvents.h"
+#include "GameFramework/DamageType.h" 
+
+DEFINE_LOG_CATEGORY_STATIC(CharacterLogs, All, All);
 
 ASTUBaseCharacter::ASTUBaseCharacter(const FObjectInitializer &ObjectInitializer)
 : Super(ObjectInitializer.SetDefaultSubobjectClass<USTUCharacterMovementComponent>(CharacterMovementComponentName))
 {
     PrimaryActorTick.bCanEverTick = true;
 
-    STUCharacterMovementComponent = Cast<USTUCharacterMovementComponent>(GetCharacterMovement());
+    CharacterMovementComponent = Cast<USTUCharacterMovementComponent>(GetCharacterMovement());
     
     CreateComponentsAndAttach();
 
@@ -67,6 +73,29 @@ void ASTUBaseCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCo
     BindInputAxis(PlayerInputComponent);
 }
 
+void ASTUBaseCharacter::BeginPlay()
+{
+    Super::BeginPlay();
+
+    check(HealthTextComponent)
+    check(HealthComponent)
+}
+
+void ASTUBaseCharacter::Tick(float DeltaSeconds)
+{
+    Super::Tick(DeltaSeconds);
+
+    const auto Health = HealthComponent->GetHealth();
+    HealthTextComponent->SetText(FText::FromString(FString::Printf(TEXT("%.0f"), Health)));
+    
+    TakeDamage(
+        0.1f, 
+        FDamageEvent(),
+        Controller, 
+        this
+    );
+}
+
 void ASTUBaseCharacter::MoveForward(float Amount)
 {
     FVector ForwardDirection = GetActorForwardVector();
@@ -105,11 +134,16 @@ void ASTUBaseCharacter::BindInputAxis(UInputComponent* PlayerInputComponent)
 void ASTUBaseCharacter::CreateComponentsAndAttach()
 {
     SpringArmComponent = CreateDefaultSubobject<USpringArmComponent>("ArmComponent");
-    SpringArmComponent->SetupAttachment(GetRootComponent());
-    SpringArmComponent->bUsePawnControlRotation = true;
+    SpringArmComponent -> SetupAttachment(GetRootComponent());
+    SpringArmComponent -> bUsePawnControlRotation = true;
 
     CameraComponent = CreateDefaultSubobject<UCameraComponent>("CameraComponent");
-    CameraComponent->SetupAttachment(SpringArmComponent);
+    CameraComponent -> SetupAttachment(SpringArmComponent);
+
+    HealthComponent = CreateDefaultSubobject<USTUHealthComponent>("HealthComponent");
+
+    HealthTextComponent = CreateDefaultSubobject<UTextRenderComponent>("HealthTextRenderer");
+    HealthTextComponent -> SetupAttachment(GetRootComponent());
 }
 
 void ASTUBaseCharacter::RunStart()
@@ -123,5 +157,5 @@ void ASTUBaseCharacter::RunEnd()
 {
     bIsRun = false;
 
-    EventBus -> SendEvent(EventNameConstants::OnStopRun);
+    EventBus->SendEvent(EventNameConstants::OnStopRun);
 }
