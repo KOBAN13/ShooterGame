@@ -105,11 +105,11 @@ void ASTUBaseCharacter::BindInputAxis(UInputComponent* PlayerInputComponent)
 void ASTUBaseCharacter::CreateComponentsAndAttach()
 {
     SpringArmComponent = CreateDefaultSubobject<USpringArmComponent>("ArmComponent");
-    SpringArmComponent -> SetupAttachment(GetRootComponent());
-    SpringArmComponent -> bUsePawnControlRotation = true;
+    SpringArmComponent->SetupAttachment(GetRootComponent());
+    SpringArmComponent->bUsePawnControlRotation = true;
 
     CameraComponent = CreateDefaultSubobject<UCameraComponent>("CameraComponent");
-    CameraComponent -> SetupAttachment(SpringArmComponent);
+    CameraComponent->SetupAttachment(SpringArmComponent);
 }
 
 void ASTUBaseCharacter::RunStart()

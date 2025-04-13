@@ -90,13 +90,13 @@ void USTUCharacterMovementComponent::Initialize()
                 1,
                 [this]()
             {
-                RunStart();
+                 RunStart();
             });
 
             EventBus -> Subscribe(
                 EventNameConstants::OnStopRun,
                 2,
-                [this]
+                [this]()
             {
                 RunEnd();
             });

@@ -51,8 +51,8 @@ class SHOOTERGAME_API UEventBusService : public UObject
 
     UEventBusService();
 
-public:
-    template<typename TEvent = UObject>
+    public:
+    template<typename TEvent>
     void Subscribe(const FName EventName, const int32 Priority, const TFunction<void(TEvent*)>& Callback)
     {
         AddReceiver<TEvent>(EventName, Priority, Callback);
@@ -60,10 +60,10 @@ public:
     
     void Subscribe(const FName EventName, const int32 Priority, const TFunction<void()>& Callback)
     {
-        AddReceiver(EventName, Priority, Callback);
+        AddReceiver<void>(EventName, Priority, Callback);
     }
-
-    template<typename TEvent = UObject>
+    
+    template<typename TEvent>
     void Unsubscribe(const FName EventName, const TFunction<void(TEvent*)>& Callback)
     {
         if(!EventReceivers.Contains(EventName))
@@ -72,21 +72,20 @@ public:
             return;
         }
         
-        const size_t Hash = EventReceivers[EventName]
-        .FindByPredicate([Callback](const TSharedPtr<FCallbackWithPriority>& Receiver)
-        -> bool
-        {
-            return Receiver.Get() -> SimpleDelegate.GetUObject() == Callback.GetUObject();
-        });
+        const void* CallbackUObject = Callback.GetUObject();
+        const FName CallbackFunctionName = Callback.GetFunctionName();
         
-        auto const Reference = EventReceiverHashToReference[Hash];
-
-        EventReceivers[EventName].Remove(Reference);
-        EventReceiverHashToReference.Remove(Hash);
+        EventReceivers[EventName].RemoveAllSwap(
+            [CallbackUObject, CallbackFunctionName](const TSharedPtr<FCallbackWithPriority>& Receiver)
+            {
+                return Receiver->OneParamDelegate.GetUObject() == CallbackUObject;
+            },
+            false
+        );
     }
-
-    template<typename TEvent = UObject>
-    void SendEvent(const FName EventName, TEvent EventObject)
+    
+    template<typename TEvent>
+    void SendEvent(const FName EventName, TEvent* EventObject)
     {
         if(!EventReceivers.Contains(EventName))
             return;
@@ -95,19 +94,14 @@ public:
         {
             if(Receiver.IsValid())
             {
-                auto* EventReceiver = Receiver.Get();
-
-                if(!EventReceiver -> OneParamDelegate.IsBound())
-                    continue;
-
-                if(auto* Object = Cast<UObject>(EventObject))
+                if(EventObject)
                 {
-                    EventReceiver -> OneParamDelegate.ExecuteIfBound(Object);
+                    Receiver->OneParamDelegate.ExecuteIfBound(EventObject);
                 }
             }
         }
     }
-
+    
     void SendEvent(const FName EventName)
     {
         if(!EventReceivers.Contains(EventName))
@@ -117,69 +111,48 @@ public:
         {
             if(Receiver.IsValid())
             {
-                const auto* EventReceiver = Receiver.Get();
-
-                if(!EventReceiver -> OneParamDelegate.IsBound())
-                    continue;
-
-                EventReceiver -> SimpleDelegate.ExecuteIfBound();
+                Receiver->SimpleDelegate.ExecuteIfBound();
             }
         }
     }
 
 private:
-    template<typename TCallback>
+    template<typename TEvent, typename TCallback>
     void ConvertAndBind(const TCallback& Callback, const TSharedPtr<FCallbackWithPriority> EventReceiver)
     {
-        if constexpr(std::is_invocable_v<TCallback> && !std::is_invocable_v<TCallback, UObject*>)
+        if constexpr(std::is_same_v<TEvent, void>)
         {
-            EventReceiver -> SimpleDelegate.BindLambda([Callback]() { Callback(); });
+            EventReceiver->SimpleDelegate.BindLambda([Callback]() { Callback(); });
         }
-
-        else if constexpr(std::is_invocable_v<TCallback, UObject*>)
+        else
         {
             EventReceiver->OneParamDelegate.BindLambda([Callback](UObject* Obj)
             {
-                if constexpr(std::is_same_v<TCallback, TFunction<void(UObject*)>>)
+                if(TEvent* TypedObj = Cast<TEvent>(Obj))
                 {
-                    Callback(Obj);
-                }
-                else
-                {
-                    using TEvent = std::remove_pointer_t<std::decay_t<decltype(Obj)>>;
-                    if(TEvent* TypedObj = Cast<TEvent>(Obj))
-                    {
-                        Callback(TypedObj);
-                    }
-                    else
-                    {
-                        UE_LOG(LogTemp, Error, TEXT("Type mismatch in delegate callback! Expected %s, got %s"),
-                            *TEvent::StaticClass()->GetName(),
-                            *Obj->GetClass()->GetName());
-                    }
+                    Callback(TypedObj);
                 }
             });
         }
     }
 
-    template<typename TCallback>
+    template<typename TEvent = void, typename TCallback>
     void AddReceiver(const FName EventName, const int32 Priority, const TCallback& Callback)
     {
         TArray<TSharedPtr<FCallbackWithPriority>>& Receivers = EventReceivers.FindOrAdd(EventName);
 
         const TSharedPtr<FCallbackWithPriority> EventReceiver = MakeShared<FCallbackWithPriority>();
-        
-        EventReceiver -> Priority = Priority;
+        EventReceiver->Priority = Priority;
 
-        ConvertAndBind(Callback, EventReceiver);
+        ConvertAndBind<TEvent>(Callback, EventReceiver);
 
         Receivers.Add(EventReceiver);
-        EventReceiverHashToReference.Add(EventReceiver -> GetHashCode(), EventReceiver);
+        EventReceiverHashToReference.Add(EventReceiver->GetHashCode(), EventReceiver);
 
         Receivers.Sort([](const TSharedPtr<FCallbackWithPriority>& A,
-            const TSharedPtr<FCallbackWithPriority>& B)
+                        const TSharedPtr<FCallbackWithPriority>& B)
         {
-            return A.Get() -> Priority > B.Get() -> Priority;
+            return A->Priority > B->Priority;
         });
     }
 };
