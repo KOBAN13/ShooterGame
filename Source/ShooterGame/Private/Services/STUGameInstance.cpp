@@ -5,7 +5,7 @@
 #include "ResourceLoaderService.h"
 #include "TweenService.h"
 #include "ServiceLocatorSubsystem.h"
-#include "EventBus/EventBusService.h"
+#include "EventBusService.h"
 
 void USTUGameInstance::Init()
 {

@@ -5,10 +5,6 @@
 #include "CoreMinimal.h"
 #include "EventBusService.generated.h"
 
-class IEventReceiver;
-class IEventInterface;
-class IBaseEventReceiver;
-
 USTRUCT()
 struct FCallbackWithPriority
 {

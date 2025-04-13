@@ -8,13 +8,12 @@
 #include "ServiceLocatorSubsystem.h"
 #include "Camera/CameraComponent.h"
 #include "Components/InputComponent.h"
-#include "EventBus/EventBusService.h"
+#include "EventBusService.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "STUHealthComponent.h"
 #include "Components/TextRenderComponent.h"
 #include "Engine/DamageEvents.h"
-#include "GameFramework/DamageType.h" 
 
 DEFINE_LOG_CATEGORY_STATIC(CharacterLogs, All, All);
 

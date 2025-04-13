@@ -9,7 +9,7 @@
 #include "STUGameInstance.h"
 #include "ServiceLocatorSubsystem.h"
 #include "TweenService.h"
-#include "EventBus/EventBusService.h"
+#include "EventBusService.h"
 
 void USTUCharacterMovementComponent::InitializeComponent()
 {
