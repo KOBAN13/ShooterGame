@@ -101,10 +101,6 @@ class SHOOTERGAME_API UEventBusService : public UObject
                 {
                     Receiver->OneParamDelegateStruct.ExecuteIfBound(EventObject);
                 }
-                else
-                {
-                    static_assert(false, "TEvent must be derived from UObject or UStruct!");
-                }
             }
         }
     }
@@ -150,10 +146,6 @@ private:
                     Callback(TypedObj);
                 }
             });
-        }
-        else
-        {
-            static_assert(false, "TEvent must be derived from UObject or UStruct!");
         }
     }
 

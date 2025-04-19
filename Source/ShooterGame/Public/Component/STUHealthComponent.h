@@ -14,10 +14,7 @@ struct FHealthParameters
 {
     GENERATED_BODY()
 
-    UPROPERTY(
-    EditDefaultsOnly,
-    BlueprintReadWrite,
-    meta = (ClampMin = "0.0", ClampMax = "500.0"), Category = "Health")
+    UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
     float Health = 0.0f;
 
     UPROPERTY(
