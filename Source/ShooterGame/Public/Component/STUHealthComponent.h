@@ -6,17 +6,19 @@
 #include "Components/ActorComponent.h"
 #include "STUFireDamageType.h"
 #include "STUIceDamageType.h"
+#include "Interfaces/HealthInterface.h"
 #include "STUHealthComponent.generated.h"
 
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
-class SHOOTERGAME_API USTUHealthComponent : public UActorComponent
+class SHOOTERGAME_API USTUHealthComponent : public UActorComponent, public IHealthInterface
 {
 	GENERATED_BODY()
 
 public:	
 	USTUHealthComponent();
-    float GetHealth() const { return Health; }
+    
+    virtual float GetHealth() const override { return Health; }
     
 protected:
     UPROPERTY(
