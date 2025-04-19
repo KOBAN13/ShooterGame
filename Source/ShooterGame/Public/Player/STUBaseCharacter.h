@@ -7,6 +7,7 @@
 #include "GameFramework/Character.h"
 #include "STUBaseCharacter.generated.h"
 
+struct FHealthParameters;
 class UTextRenderComponent;
 class USTUHealthComponent;
 class UCharacterConfig;
@@ -15,6 +16,8 @@ class USpringArmComponent;
 class UServiceLocatorSubsystem;
 class UEventBusService;
 class USTUCharacterMovementComponent;
+
+DEFINE_LOG_CATEGORY_STATIC(LogBaseCharacter, All, All);
 
 UCLASS()
 class SHOOTERGAME_API ASTUBaseCharacter : public ACharacter
@@ -37,6 +40,9 @@ public:
     UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Components")
     UTextRenderComponent* HealthTextComponent;
 
+    UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Animation")
+    UAnimMontage* DeathAnimation;
+
     UPROPERTY()
     UCharacterConfig* CharacterConfig;
 
@@ -57,7 +63,6 @@ public:
     ASTUBaseCharacter(const FObjectInitializer &ObjectInitializer);
 
     virtual void SetupPlayerInputComponent(UInputComponent* PlayerInputComponent) override;
-    virtual void Tick(float DeltaSeconds) override;
     virtual void BeginPlay() override; 
 
 private:
@@ -69,4 +74,6 @@ private:
     void CreateComponentsAndAttach();
     void RunStart();
     void RunEnd();
+    void OnDeath();
+    void OnHealthChanged(FHealthParameters HealthParameters) const;
 };

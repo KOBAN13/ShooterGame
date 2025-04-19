@@ -17,6 +17,9 @@ struct FCallbackWithPriority
     DECLARE_DELEGATE(FGenericDelegate);
     FGenericDelegate SimpleDelegate;
 
+    DECLARE_DELEGATE_OneParam(FGenericDelegateOneParamStruct, UStruct*);
+    FGenericDelegateOneParamStruct OneParamDelegateStruct;
+
     virtual size_t GetHashCode() const
     {
         size_t Hash = GetTypeHash(Priority);
@@ -83,16 +86,24 @@ class SHOOTERGAME_API UEventBusService : public UObject
     template<typename TEvent>
     void SendEvent(const FName EventName, TEvent* EventObject)
     {
-        if(!EventReceivers.Contains(EventName))
+        if (!EventReceivers.Contains(EventName))
             return;
-        
-        for(const auto& Receiver : EventReceivers[EventName])
+    
+        for (const auto& Receiver : EventReceivers[EventName])
         {
-            if(Receiver.IsValid())
+            if (Receiver.IsValid() && EventObject)
             {
-                if(EventObject)
+                if constexpr (std::is_base_of_v<UObject, TEvent>)
                 {
                     Receiver->OneParamDelegate.ExecuteIfBound(EventObject);
+                }
+                else if constexpr (std::is_base_of_v<UStruct, TEvent>)
+                {
+                    Receiver->OneParamDelegateStruct.ExecuteIfBound(EventObject);
+                }
+                else
+                {
+                    static_assert(false, "TEvent must be derived from UObject or UStruct!");
                 }
             }
         }
@@ -120,7 +131,7 @@ private:
         {
             EventReceiver->SimpleDelegate.BindLambda([Callback]() { Callback(); });
         }
-        else
+        else if constexpr(std::is_base_of_v<UObject, TEvent>)
         {
             EventReceiver->OneParamDelegate.BindLambda([Callback](UObject* Obj)
             {
@@ -129,6 +140,20 @@ private:
                     Callback(TypedObj);
                 }
             });
+        }
+        else if constexpr(std::is_base_of_v<UStruct, TEvent>)
+        {
+            EventReceiver->OneParamDelegateStruct.BindLambda([Callback](UStruct* Obj)
+            {
+                if(TEvent* TypedObj = Cast<TEvent>(Obj))
+                {
+                    Callback(TypedObj);
+                }
+            });
+        }
+        else
+        {
+            static_assert(false, "TEvent must be derived from UObject or UStruct!");
         }
     }
 

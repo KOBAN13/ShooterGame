@@ -13,9 +13,6 @@
 #include "Kismet/KismetMathLibrary.h"
 #include "STUHealthComponent.h"
 #include "Components/TextRenderComponent.h"
-#include "Engine/DamageEvents.h"
-
-DEFINE_LOG_CATEGORY_STATIC(CharacterLogs, All, All);
 
 ASTUBaseCharacter::ASTUBaseCharacter(const FObjectInitializer &ObjectInitializer)
 : Super(ObjectInitializer.SetDefaultSubobjectClass<USTUCharacterMovementComponent>(CharacterMovementComponentName))
@@ -30,13 +27,10 @@ ASTUBaseCharacter::ASTUBaseCharacter(const FObjectInitializer &ObjectInitializer
     {
         if (const auto* GameInstance = Cast<USTUGameInstance>(World -> GetGameInstance()))
         {
-            const auto* ServiceLocator = GameInstance->GetServiceLocator();
-
-            EventBus = nullptr;
-
-            if(ServiceLocator -> TryGetService(EventBus))
+            if (const auto* ServiceLocator = GameInstance->GetServiceLocator();
+                ServiceLocator -> TryGetService(EventBus))
             {
-                check(EventBus != nullptr);
+                check(EventBus);
             }
         }
     } 
@@ -78,14 +72,10 @@ void ASTUBaseCharacter::BeginPlay()
 
     check(HealthTextComponent)
     check(HealthComponent)
-}
+    check(CharacterMovementComponent)
 
-void ASTUBaseCharacter::Tick(float DeltaSeconds)
-{
-    Super::Tick(DeltaSeconds);
-
-    const auto Health = HealthComponent->GetHealth();
-    HealthTextComponent->SetText(FText::FromString(FString::Printf(TEXT("%.0f"), Health)));
+    EventBus -> Subscribe(EventNameConstants::OnCharacterDead, 1, [this]() { OnDeath(); });
+    EventBus -> Subscribe<FHealthParameters>(EventNameConstants::OnHealthChanged, 1, [this](const FHealthParameters* Health) { OnHealthChanged(*Health); });
 }
 
 void ASTUBaseCharacter::MoveForward(float Amount)
@@ -150,4 +140,18 @@ void ASTUBaseCharacter::RunEnd()
     bIsRun = false;
 
     EventBus->SendEvent(EventNameConstants::OnStopRun);
+}
+
+void ASTUBaseCharacter::OnDeath()
+{
+    PlayAnimMontage(DeathAnimation);
+
+    CharacterMovementComponent->DisableMovement();
+
+    SetLifeSpan(5.0f);
+}
+
+void ASTUBaseCharacter::OnHealthChanged(const FHealthParameters HealthParameters) const
+{
+    HealthTextComponent->SetText(FText::FromString(FString::Printf(TEXT("%.0f"), HealthParameters.Health)));
 }

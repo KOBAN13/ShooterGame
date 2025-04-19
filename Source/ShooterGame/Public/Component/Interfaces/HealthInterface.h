@@ -18,4 +18,5 @@ class SHOOTERGAME_API IHealthInterface
     
 public:
     virtual float GetHealth() const = 0;
+    virtual bool IsDead() const = 0;
 };

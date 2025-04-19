@@ -9,29 +9,46 @@
 #include "Interfaces/HealthInterface.h"
 #include "STUHealthComponent.generated.h"
 
+USTRUCT(BlueprintType)
+struct FHealthParameters
+{
+    GENERATED_BODY()
 
+    UPROPERTY(
+    EditDefaultsOnly,
+    BlueprintReadWrite,
+    meta = (ClampMin = "0.0", ClampMax = "500.0"), Category = "Health")
+    float Health = 0.0f;
+
+    UPROPERTY(
+    EditDefaultsOnly,
+    BlueprintReadWrite,
+    meta = (ClampMin = "0.0", ClampMax = "500.0"), Category = "Health")
+    float MaxHealth = 100.0f;
+};
+
+class UEventBusService;
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class SHOOTERGAME_API USTUHealthComponent : public UActorComponent, public IHealthInterface
 {
 	GENERATED_BODY()
 
-public:	
+public:
+    UPROPERTY()
+    UEventBusService* EventBus;
+
+    UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
+    FHealthParameters HealthParameters;
+    
 	USTUHealthComponent();
     
-    virtual float GetHealth() const override { return Health; }
-    
-protected:
-    UPROPERTY(
-        EditDefaultsOnly,
-        BlueprintReadWrite,
-        meta = (ClampMin = "0.0", ClampMax = "500.0"), Category = "Health"
-    )
-    float MaxHealth = 100.0f;
-    
-	virtual void BeginPlay() override;
+    virtual float GetHealth() const override { return HealthParameters.Health; }
 
-private:
-    float Health = 0.0f;
+    UFUNCTION(BlueprintCallable)
+    virtual bool IsDead() const override { return HealthParameters.Health <= 0.0f; }
+
+protected:
+	virtual void BeginPlay() override;
 
     UFUNCTION()
     void OnTakeAnyDamage(
