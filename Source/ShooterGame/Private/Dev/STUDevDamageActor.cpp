@@ -2,6 +2,7 @@
 
 #include "STUDevDamageActor.h"
 #include "DrawDebugHelpers.h"
+#include "Kismet/GameplayStatics.h"
 
 ASTUDevDamageActor::ASTUDevDamageActor()
 {
@@ -20,6 +21,11 @@ void ASTUDevDamageActor::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-    DrawDebugSphere(GetWorld(), GetActorLocation(), Radius, 24, SphereColor);
+    const auto* World = GetWorld();
+    const auto ActorLocation = GetActorLocation();
+
+    DrawDebugSphere(World, ActorLocation, Radius, 24, SphereColor);
+
+    UGameplayStatics::ApplyRadialDamage(World, Damage, ActorLocation, Radius, DamageTypeClass, {}, this, nullptr, DoFullDamage);
 }
 

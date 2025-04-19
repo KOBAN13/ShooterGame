@@ -23,5 +23,21 @@ void USTUHealthComponent::OnTakeAnyDamage(AActor* DamagedActor, float Damage, co
     AController* InstigatedBy, AActor* DamageCauser)
 {
     Health = FMath::Clamp(Health - Damage, 0.0f, MaxHealth);
+
+    if (const IDamageTypeInterface* DamageTypeInterface = Cast<IDamageTypeInterface>(DamageType))
+    {
+        switch (DamageTypeInterface -> GetDamageCategory())
+        {
+            case EDamageCategory::Fire:
+                UE_LOG(LogHealthComponent, Warning, TEXT("Take Fire Damage"));
+                break;
+            
+            case EDamageCategory::Ice:
+                UE_LOG(LogHealthComponent, Warning, TEXT("Take Ice Damage"));
+                break;
+            
+            default: break;
+        }
+    }
 }
 

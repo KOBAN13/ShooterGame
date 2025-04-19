@@ -4,6 +4,8 @@
 
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
+#include "STUFireDamageType.h"
+#include "STUIceDamageType.h"
 #include "STUHealthComponent.generated.h"
 
 
