@@ -23,18 +23,6 @@ ASTUBaseCharacter::ASTUBaseCharacter(const FObjectInitializer &ObjectInitializer
     CharacterMovementComponent = Cast<USTUCharacterMovementComponent>(GetCharacterMovement());
     
     CreateComponentsAndAttach();
-
-    if (const auto* World = GetWorld())
-    {
-        if (const auto* GameInstance = Cast<USTUGameInstance>(World -> GetGameInstance()))
-        {
-            if (const auto* ServiceLocator = GameInstance->GetServiceLocator();
-                ServiceLocator -> TryGetService(EventBus))
-            {
-                check(EventBus);
-            }
-        }
-    } 
 }
 
 bool ASTUBaseCharacter::IsRunning() const
@@ -74,10 +62,8 @@ void ASTUBaseCharacter::BeginPlay()
     check(HealthTextComponent)
     check(HealthComponent)
     check(CharacterMovementComponent)
-
-    //EventBus -> Subscribe(EventNameConstants::OnCharacterDead, 1, [this]() { OnDeath(); });
-    //EventBus -> SubscribeStruct<FHealthParameters>(EventNameConstants::OnHealthChanged, 1, [this](const FHealthParameters* Health) { OnHealthChanged(*Health); });
-
+    
+    SUBSCRIBE_EVENT(EventNameConstants::OnCharacterDead, 1, [this]() { OnDeath(); });
     SUBSCRIBE_STRUCT_EVENT(EventNameConstants::OnHealthChanged, 1, FHealthParameters, [this](const FHealthParameters* Health) { OnHealthChanged(*Health); });
 }
 

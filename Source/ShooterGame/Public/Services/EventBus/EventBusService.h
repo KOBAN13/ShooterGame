@@ -70,10 +70,19 @@ class SHOOTERGAME_API UEventBusService : public UObject
     TMap<FName, TArray<TSharedPtr<FCallbackWithPriorityStruct>>> EventReceiversStruct;
     TMap<size_t, TSharedPtr<FCallbackWithPriorityObject>> EventReceiverObjectHashToReference;
     TMap<size_t, TSharedPtr<FCallbackWithPriorityStruct>> EventReceiverStructHashToReference;
+   
+    static UEventBusService* Instance;
 
     UEventBusService();
 
-    public:
+public:
+    static UEventBusService* GetInstance();
+    static void InitializeSingleton();
+    static void Shutdown();
+
+    virtual void BeginDestroy() override;
+
+    
     template<typename TEvent>
     void Subscribe(const FName EventName, const int32 Priority, const TFunction<void(TEvent*)>& Callback)
     {

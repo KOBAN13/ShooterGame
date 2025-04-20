@@ -32,9 +32,6 @@ class SHOOTERGAME_API USTUHealthComponent : public UActorComponent, public IHeal
 	GENERATED_BODY()
 
 public:
-    UPROPERTY()
-    UEventBusService* EventBus;
-
     UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
     FHealthParameters HealthParameters;
     

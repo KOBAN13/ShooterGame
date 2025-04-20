@@ -9,3 +9,36 @@ UEventBusService::UEventBusService()
     EventReceiverObjectHashToReference = TMap<size_t, TSharedPtr<FCallbackWithPriorityObject>>();
     EventReceiverStructHashToReference = TMap<size_t, TSharedPtr<FCallbackWithPriorityStruct>>();
 }
+
+UEventBusService* UEventBusService::GetInstance()
+{
+    if(!Instance)
+    {
+        InitializeSingleton();
+    }
+    return Instance;
+}
+
+void UEventBusService::InitializeSingleton()
+{
+    if (!Instance)
+    {
+        Instance = NewObject<UEventBusService>();
+        Instance -> AddToRoot(); 
+    }
+}
+
+void UEventBusService::Shutdown()
+{
+    if (Instance)
+    {
+        Instance->RemoveFromRoot();
+        Instance = nullptr;
+    }
+}
+
+void UEventBusService::BeginDestroy()
+{
+    Shutdown();
+    Super::BeginDestroy();
+}

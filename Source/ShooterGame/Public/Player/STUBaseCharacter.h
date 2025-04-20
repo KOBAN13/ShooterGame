@@ -45,9 +45,6 @@ public:
 
     UPROPERTY()
     UCharacterConfig* CharacterConfig;
-
-    UPROPERTY()
-    UEventBusService* EventBus;
     
 private:
     bool bIsWalk = false;

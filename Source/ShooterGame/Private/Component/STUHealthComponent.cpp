@@ -20,18 +20,6 @@ void USTUHealthComponent::BeginPlay()
     {
         Owner -> OnTakeAnyDamage.AddDynamic(this, &USTUHealthComponent::OnTakeAnyDamage);
     }
-
-    if (const auto* World = GetWorld())
-    {
-        if (const auto* GameInstance = Cast<USTUGameInstance>(World -> GetGameInstance()))
-        {
-            if (const auto* ServiceLocator = GameInstance->GetServiceLocator();
-                ServiceLocator -> TryGetService(EventBus))
-            {
-                check(EventBus);
-            }
-        }
-    }
 }
 
 void USTUHealthComponent::OnTakeAnyDamage(
