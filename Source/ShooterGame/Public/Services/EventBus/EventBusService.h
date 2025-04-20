@@ -42,6 +42,7 @@ struct FCallbackWithPriorityObject
         return Hash;
     }
     
+    
     virtual ~FCallbackWithPriorityObject() = default;
 };
 
@@ -49,11 +50,23 @@ USTRUCT()
 struct FCallbackWithPriorityStruct
 {
     GENERATED_BODY()
-
     int32 Priority;
 
     DECLARE_DELEGATE_TwoParams(FGenericStructDelegate, UScriptStruct*, void*);
     FGenericStructDelegate StructDelegate;
+
+    virtual size_t GetHashCode() const
+    {
+        size_t Hash = GetTypeHash(Priority);
+        
+        if(StructDelegate.IsBound())
+        {
+            Hash = HashCombine(Hash, GetTypeHash(StructDelegate.GetUObject()));
+        }
+        
+        return Hash;
+    }
+    virtual ~FCallbackWithPriorityStruct() = default;
 };
 
 UCLASS()
@@ -63,7 +76,8 @@ class SHOOTERGAME_API UEventBusService : public UObject
 
     TMap<FName, TArray<TSharedPtr<FCallbackWithPriorityObject>>> EventReceiversObject;
     TMap<FName, TArray<TSharedPtr<FCallbackWithPriorityStruct>>> EventReceiversStruct;
-    TMap<size_t, TSharedPtr<FCallbackWithPriorityObject>> EventReceiverHashToReference;
+    TMap<size_t, TSharedPtr<FCallbackWithPriorityObject>> EventReceiverObjectHashToReference;
+    TMap<size_t, TSharedPtr<FCallbackWithPriorityStruct>> EventReceiverStructHashToReference;
 
     UEventBusService();
 
@@ -78,30 +92,11 @@ class SHOOTERGAME_API UEventBusService : public UObject
     {
         AddReceiver<void>(EventName, Priority, Callback);
     }
-
+    
     template<typename TStruct>
     void SubscribeStruct(const FName EventName, const int32 Priority, const TFunction<void(TStruct*)>& Callback)
     {
-        TArray<TSharedPtr<FCallbackWithPriorityStruct>>& Receivers = EventReceiversStruct.FindOrAdd(EventName);
-
-        const TSharedPtr<FCallbackWithPriorityStruct> EventReceiver = MakeShared<FCallbackWithPriorityStruct>();
-
-        EventReceiver -> Priority = Priority;
-        EventReceiver -> StructDelegate.BindLambda([Callback](UScriptStruct* StructType, void* Data)
-        {
-            if(StructType == TStruct::StaticStruct())
-            {
-                Callback(static_cast<TStruct*>(Data));
-            }
-        });
-
-        Receivers.Add(EventReceiver);
-
-        Receivers.Sort([](const TSharedPtr<FCallbackWithPriorityStruct>& A,
-                const TSharedPtr<FCallbackWithPriorityStruct>& B)
-                {
-                    return A -> Priority > B -> Priority;
-                });
+        AddReceiverStruct<TStruct>(EventName, Priority, Callback);
     }
     
     void Unsubscribe(const FName EventName)
@@ -110,7 +105,7 @@ class SHOOTERGAME_API UEventBusService : public UObject
         {
             if (Receiver.IsValid())
             {
-                EventReceiverHashToReference.Remove(Receiver->GetHashCode());
+                EventReceiverObjectHashToReference.Remove(Receiver->GetHashCode());
                 EventReceiversObject.Remove(EventName);
             }
         }
@@ -118,7 +113,14 @@ class SHOOTERGAME_API UEventBusService : public UObject
     
     void UnsubscribeStruct(const FName EventName)
     {
-        EventReceiversStruct.Remove(EventName);
+        for (auto Receiver : EventReceiversStruct[EventName])
+        {
+            if (Receiver.IsValid())
+            {
+                EventReceiverStructHashToReference.Remove(Receiver->GetHashCode());
+                EventReceiversStruct.Remove(EventName);
+            }
+        }
     }
 
     template<typename TStruct>
@@ -195,17 +197,44 @@ private:
         TArray<TSharedPtr<FCallbackWithPriorityObject>>& Receivers = EventReceiversObject.FindOrAdd(EventName);
 
         const TSharedPtr<FCallbackWithPriorityObject> EventReceiver = MakeShared<FCallbackWithPriorityObject>();
-        EventReceiver->Priority = Priority;
+        EventReceiver -> Priority = Priority;
 
         ConvertAndBind<TEvent>(Callback, EventReceiver);
 
         Receivers.Add(EventReceiver);
-        EventReceiverHashToReference.Add(EventReceiver->GetHashCode(), EventReceiver);
+        EventReceiverObjectHashToReference.Add(EventReceiver->GetHashCode(), EventReceiver);
 
         Receivers.Sort([](const TSharedPtr<FCallbackWithPriorityObject>& A,
                         const TSharedPtr<FCallbackWithPriorityObject>& B)
         {
             return A -> Priority > B -> Priority;
         });
+    }
+
+    template<typename TStruct>
+    void AddReceiverStruct(const FName EventName, const int32 Priority, const TFunction<void(TStruct*)>& Callback)
+    {
+        TArray<TSharedPtr<FCallbackWithPriorityStruct>>& Receivers = EventReceiversStruct.FindOrAdd(EventName);
+
+        const TSharedPtr<FCallbackWithPriorityStruct> EventReceiver = MakeShared<FCallbackWithPriorityStruct>();
+
+        EventReceiver -> Priority = Priority;
+        EventReceiver -> StructDelegate.BindLambda([Callback](UScriptStruct* StructType, void* Data)
+        {
+            if(StructType == TStruct::StaticStruct())
+            {
+                Callback(static_cast<TStruct*>(Data));
+            }
+        });
+
+        Receivers.Add(EventReceiver);
+
+        Receivers.Sort([](const TSharedPtr<FCallbackWithPriorityStruct>& A,
+                const TSharedPtr<FCallbackWithPriorityStruct>& B)
+                {
+                    return A -> Priority > B -> Priority;
+                });
+
+        EventReceiverStructHashToReference.Add(EventReceiver->GetHashCode(), EventReceiver);
     }
 };
