@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "EventBusMacros.h"
 #include "Components/ActorComponent.h"
 #include "STUFireDamageType.h"
 #include "STUIceDamageType.h"

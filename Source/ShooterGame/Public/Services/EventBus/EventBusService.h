@@ -6,51 +6,10 @@
 #include "EventBusService.generated.h"
 
 USTRUCT()
-struct FCallbackWithPriorityObject
-{
-    GENERATED_BODY()
-    int32 Priority;
-    
-    DECLARE_DELEGATE_OneParam(FGenericDelegateOneParam, UObject*);
-    FGenericDelegateOneParam OneParamDelegate;
-
-    DECLARE_DELEGATE(FGenericDelegate);
-    FGenericDelegate SimpleDelegate;
-
-    DECLARE_DELEGATE_TwoParams(FGenericStructDelegate, UStruct*, const void*);
-    FGenericStructDelegate StructDelegate;
-
-    virtual size_t GetHashCode() const
-    {
-        size_t Hash = GetTypeHash(Priority);
-
-        if (SimpleDelegate.IsBound())
-        {
-            Hash = HashCombine(Hash, GetTypeHash(SimpleDelegate.GetUObject()));
-        }
-
-        if(OneParamDelegate.IsBound())
-        {
-            Hash = HashCombine(Hash, GetTypeHash(OneParamDelegate.GetUObject()));
-        }
-
-        if(StructDelegate.IsBound())
-        {
-            Hash = HashCombine(Hash, GetTypeHash(StructDelegate.GetUObject()));
-        }
-        
-        return Hash;
-    }
-    
-    
-    virtual ~FCallbackWithPriorityObject() = default;
-};
-
-USTRUCT()
 struct FCallbackWithPriorityStruct
 {
     GENERATED_BODY()
-    int32 Priority;
+    int32 Priority = 0;
 
     DECLARE_DELEGATE_TwoParams(FGenericStructDelegate, UScriptStruct*, void*);
     FGenericStructDelegate StructDelegate;
@@ -67,6 +26,39 @@ struct FCallbackWithPriorityStruct
         return Hash;
     }
     virtual ~FCallbackWithPriorityStruct() = default;
+};
+
+USTRUCT()
+struct FCallbackWithPriorityObject
+{
+    GENERATED_BODY()
+    int32 Priority;
+    
+    DECLARE_DELEGATE_OneParam(FGenericDelegateOneParam, UObject*);
+    FGenericDelegateOneParam OneParamDelegate;
+
+    DECLARE_DELEGATE(FGenericDelegate);
+    FGenericDelegate SimpleDelegate;
+
+    virtual size_t GetHashCode() const
+    {
+        size_t Hash = GetTypeHash(Priority);
+
+        if (SimpleDelegate.IsBound())
+        {
+            Hash = HashCombine(Hash, GetTypeHash(SimpleDelegate.GetUObject()));
+        }
+
+        if(OneParamDelegate.IsBound())
+        {
+            Hash = HashCombine(Hash, GetTypeHash(OneParamDelegate.GetUObject()));
+        }
+        
+        return Hash;
+    }
+    
+    
+    virtual ~FCallbackWithPriorityObject() = default;
 };
 
 UCLASS()
@@ -156,15 +148,14 @@ class SHOOTERGAME_API UEventBusService : public UObject
         }
     }
     
-    
     void SendEvent(const FName EventName)
     {
-        if(!EventReceiversObject.Contains(EventName))
+        if (!EventReceiversObject.Contains(EventName))
             return;
-        
-        for(const auto& Receiver : EventReceiversObject[EventName])
+
+        for (const auto& Receiver : EventReceiversObject[EventName])
         {
-            if(Receiver.IsValid())
+            if (Receiver.IsValid())
             {
                 Receiver->SimpleDelegate.ExecuteIfBound();
             }

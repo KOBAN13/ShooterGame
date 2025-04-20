@@ -2,6 +2,7 @@
 
 #include "STUBaseCharacter.h"
 
+#include "EventBusMacros.h"
 #include "EventNameConstants.h"
 #include "STUCharacterMovementComponent.h"
 #include "STUGameInstance.h"
@@ -74,8 +75,10 @@ void ASTUBaseCharacter::BeginPlay()
     check(HealthComponent)
     check(CharacterMovementComponent)
 
-    EventBus -> Subscribe(EventNameConstants::OnCharacterDead, 1, [this]() { OnDeath(); });
-    EventBus -> SubscribeStruct<FHealthParameters>(EventNameConstants::OnHealthChanged, 1, [this](const FHealthParameters* Health) { OnHealthChanged(*Health); });
+    //EventBus -> Subscribe(EventNameConstants::OnCharacterDead, 1, [this]() { OnDeath(); });
+    //EventBus -> SubscribeStruct<FHealthParameters>(EventNameConstants::OnHealthChanged, 1, [this](const FHealthParameters* Health) { OnHealthChanged(*Health); });
+
+    SUBSCRIBE_STRUCT_EVENT(EventNameConstants::OnHealthChanged, 1, FHealthParameters, [this](const FHealthParameters* Health) { OnHealthChanged(*Health); });
 }
 
 void ASTUBaseCharacter::MoveForward(float Amount)
