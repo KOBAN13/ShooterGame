@@ -41,7 +41,7 @@ void USTUHealthComponent::OnTakeAnyDamage(
 
     HealthParameters.Health = FMath::Clamp(HealthParameters.Health - Damage, 0.0f, HealthParameters.MaxHealth);
 
-    EventBus -> SendEvent<FHealthParameters>(EventNameConstants::OnHealthChanged, &HealthParameters);
+    EventBus -> SendEventStruct<FHealthParameters>(EventNameConstants::OnHealthChanged, &HealthParameters);
 
     if (const IDamageTypeInterface* DamageTypeInterface = Cast<IDamageTypeInterface>(DamageType))
     {

@@ -75,7 +75,7 @@ void ASTUBaseCharacter::BeginPlay()
     check(CharacterMovementComponent)
 
     EventBus -> Subscribe(EventNameConstants::OnCharacterDead, 1, [this]() { OnDeath(); });
-    EventBus -> Subscribe<FHealthParameters>(EventNameConstants::OnHealthChanged, 1, [this](const FHealthParameters* Health) { OnHealthChanged(*Health); });
+    EventBus -> SubscribeStruct<FHealthParameters>(EventNameConstants::OnHealthChanged, 1, [this](const FHealthParameters* Health) { OnHealthChanged(*Health); });
 }
 
 void ASTUBaseCharacter::MoveForward(float Amount)
