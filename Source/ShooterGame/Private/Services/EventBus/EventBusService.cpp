@@ -41,6 +41,10 @@ void UEventBusService::Shutdown()
 
 void UEventBusService::BeginDestroy()
 {
+    EventReceiversObject.Empty();
+    EventReceiversStruct.Empty();
+    EventReceiverObjectHashToReference.Empty();
+    EventReceiverStructHashToReference.Empty();
     Shutdown();
     Super::BeginDestroy();
 }
