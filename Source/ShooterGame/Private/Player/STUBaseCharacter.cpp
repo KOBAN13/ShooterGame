@@ -5,8 +5,6 @@
 #include "EventBusMacros.h"
 #include "EventNameConstants.h"
 #include "STUCharacterMovementComponent.h"
-#include "STUGameInstance.h"
-#include "ServiceLocatorSubsystem.h"
 #include "Camera/CameraComponent.h"
 #include "Components/InputComponent.h"
 #include "EventBusService.h"
@@ -64,7 +62,13 @@ void ASTUBaseCharacter::BeginPlay()
     check(CharacterMovementComponent)
     
     SUBSCRIBE_EVENT(EventNameConstants::OnCharacterDead, 1, [this]() { OnDeath(); });
-    SUBSCRIBE_STRUCT_EVENT(EventNameConstants::OnHealthChanged, 1, FHealthParameters, [this](const FHealthParameters* Health) { OnHealthChanged(*Health); });
+    
+    SUBSCRIBE_STRUCT_EVENT(
+        EventNameConstants::OnHealthChanged,
+        1,
+        FHealthParameters,
+        [this](const FHealthParameters* Health) { OnHealthChanged(*Health); }
+    );
 }
 
 void ASTUBaseCharacter::MoveForward(float Amount)
@@ -120,15 +124,15 @@ void ASTUBaseCharacter::CreateComponentsAndAttach()
 void ASTUBaseCharacter::RunStart()
 {
     bIsRun = true;
-
-    EventBus -> SendEvent(EventNameConstants::OnStartRun);
+    
+    SEND_EVENT(EventNameConstants::OnStartRun);
 }
 
 void ASTUBaseCharacter::RunEnd()
 {
     bIsRun = false;
 
-    EventBus->SendEvent(EventNameConstants::OnStopRun);
+    SEND_EVENT(EventNameConstants::OnStopRun);
 }
 
 void ASTUBaseCharacter::OnDeath()

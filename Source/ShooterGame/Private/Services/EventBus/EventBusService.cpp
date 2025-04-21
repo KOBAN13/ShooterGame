@@ -2,6 +2,8 @@
 
 #include "EventBusService.h"
 
+UEventBusService* UEventBusService::Instance = nullptr;
+
 UEventBusService::UEventBusService()
 {
     EventReceiversObject = TMap<FName, TArray<TSharedPtr<FCallbackWithPriorityObject>>>();

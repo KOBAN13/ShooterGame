@@ -70,7 +70,7 @@ class SHOOTERGAME_API UEventBusService : public UObject
     TMap<FName, TArray<TSharedPtr<FCallbackWithPriorityStruct>>> EventReceiversStruct;
     TMap<size_t, TSharedPtr<FCallbackWithPriorityObject>> EventReceiverObjectHashToReference;
     TMap<size_t, TSharedPtr<FCallbackWithPriorityStruct>> EventReceiverStructHashToReference;
-   
+    
     static UEventBusService* Instance;
 
     UEventBusService();
