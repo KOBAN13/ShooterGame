@@ -3,29 +3,15 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "EventBusMacros.h"
 #include "Components/ActorComponent.h"
-#include "STUFireDamageType.h"
-#include "STUIceDamageType.h"
 #include "Interfaces/HealthInterface.h"
+#include "Parameters/FHealthParameters.h"
+#include "Parameters/FHealthRecoveryParameters.h"
 #include "STUHealthComponent.generated.h"
 
-USTRUCT(BlueprintType)
-struct FHealthParameters
-{
-    GENERATED_BODY()
-
-    UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
-    float Health = 0.0f;
-
-    UPROPERTY(
-    EditDefaultsOnly,
-    BlueprintReadWrite,
-    meta = (ClampMin = "0.0", ClampMax = "500.0"), Category = "Health")
-    float MaxHealth = 100.0f;
-};
-
+class UTweenService;
 class UEventBusService;
+
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class SHOOTERGAME_API USTUHealthComponent : public UActorComponent, public IHealthInterface
 {
@@ -34,6 +20,9 @@ class SHOOTERGAME_API USTUHealthComponent : public UActorComponent, public IHeal
 public:
     UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
     FHealthParameters HealthParameters;
+
+    UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
+    FHealthRecoveryParameters HealthRecoveryParameters;
     
 	USTUHealthComponent();
     
@@ -53,4 +42,11 @@ protected:
         AController* InstigatedBy,
         AActor* DamageCauser
     );
+
+private:
+    FTimerHandle RecoveryTimerHandle;
+    UTweenService* TweenService;
+
+    void RecoveryHealth() const;
+    void StartHealthRecoveryTimer();
 };

@@ -12,6 +12,7 @@
 #include "Kismet/KismetMathLibrary.h"
 #include "STUHealthComponent.h"
 #include "Components/TextRenderComponent.h"
+#include "GameFramework/Controller.h"
 
 ASTUBaseCharacter::ASTUBaseCharacter(const FObjectInitializer &ObjectInitializer)
 : Super(ObjectInitializer.SetDefaultSubobjectClass<USTUCharacterMovementComponent>(CharacterMovementComponentName))
@@ -142,6 +143,11 @@ void ASTUBaseCharacter::OnDeath()
     CharacterMovementComponent->DisableMovement();
 
     SetLifeSpan(5.0f);
+
+    if(Controller)
+    {
+        Controller -> ChangeState(NAME_Spectating);
+    }
 }
 
 void ASTUBaseCharacter::OnHealthChanged(const FHealthParameters HealthParameters) const

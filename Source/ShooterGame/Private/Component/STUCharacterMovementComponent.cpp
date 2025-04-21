@@ -4,12 +4,12 @@
 
 #include "CharacterConfig.h"
 #include "ConstantsLoader.h"
+#include "EventBusMacros.h"
 #include "EventNameConstants.h"
 #include "ResourceLoaderService.h"
 #include "STUGameInstance.h"
 #include "ServiceLocatorSubsystem.h"
 #include "TweenService.h"
-#include "EventBusService.h"
 
 void USTUCharacterMovementComponent::InitializeComponent()
 {
@@ -19,50 +19,35 @@ void USTUCharacterMovementComponent::InitializeComponent()
 
 void USTUCharacterMovementComponent::RunStart()
 {
-    UTweenService* TweenService = nullptr;
-    
-    if(ServiceLocator -> TryGetService(TweenService))
-    {
-        TweenService -> TweenKill(IdTweenRunStart);
-        IdTweenRunStart = TweenService -> TweenFloat(CharacterConfig -> MaxSpeed,
-            CharacterConfig -> RunSpeed,
-            CharacterConfig -> TimeInterpolation,
-            [this](float Speed)
-            {
-                MaxWalkSpeed = Speed;
-            },
-            []() { GEngine -> AddOnScreenDebugMessage(-1, 5.0f, FColor::Red, TEXT("RunStart")); }
-            );
-    }
+    TweenService -> TweenKill(IdTweenRunStart);
+    IdTweenRunStart = TweenService -> TweenFloat(CharacterConfig -> MaxSpeed,
+        CharacterConfig -> RunSpeed,
+        CharacterConfig -> TimeInterpolation,
+        [this](float Speed)
+        {
+            MaxWalkSpeed = Speed;
+        },
+        []() { GEngine -> AddOnScreenDebugMessage(-1, 5.0f, FColor::Red, TEXT("RunStart")); }
+        );
 }
 
 void USTUCharacterMovementComponent::RunEnd()
 {
-    UTweenService* TweenService = nullptr;
-
-    if (ServiceLocator->TryGetService(TweenService))
-    {
-        TweenService->TweenKill(IdTweenRunEnd);
-        IdTweenRunEnd = TweenService->TweenFloat(
-            CharacterConfig->MaxSpeed, CharacterConfig->MaxSpeed, CharacterConfig->TimeInterpolation, [this](float Speed)
-            { MaxWalkSpeed = Speed; }, []() { GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Red, TEXT("RunEnd")); });
-    }
+    TweenService->TweenKill(IdTweenRunEnd);
+    IdTweenRunEnd = TweenService->TweenFloat(
+        CharacterConfig->MaxSpeed, CharacterConfig->MaxSpeed, CharacterConfig->TimeInterpolation, [this](float Speed)
+        { MaxWalkSpeed = Speed; }, []() { GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Red, TEXT("RunEnd")); });
 }
 
 void USTUCharacterMovementComponent::OnCharacterConfigLoaded()
 {
-    UResourceLoaderService* ResourceLoaderService = nullptr;
-    
-    if(ServiceLocator -> TryGetService(ResourceLoaderService))
-    {
-        UDataAsset* DataAsset = ResourceLoaderService
-            -> GetResource(ConstantsLoader::CharacterConfig);
+    UDataAsset* DataAsset = ResourceLoaderService
+    -> GetResource(ConstantsLoader::CharacterConfig);
 
-        check(DataAsset)
+    check(DataAsset)
 
-        CharacterConfig = Cast<UCharacterConfig>(DataAsset);
-        MaxWalkSpeed = CharacterConfig -> MaxSpeed;
-    }
+    CharacterConfig = Cast<UCharacterConfig>(DataAsset);
+    MaxWalkSpeed = CharacterConfig -> MaxSpeed;
 }
 
 void USTUCharacterMovementComponent::Initialize()
@@ -71,35 +56,20 @@ void USTUCharacterMovementComponent::Initialize()
     {
         if (const auto* GameInstance = Cast<USTUGameInstance>(World -> GetGameInstance()))
         {
-            ServiceLocator = GameInstance->GetServiceLocator();
-
-            UResourceLoaderService* ResourceLoaderService = nullptr;
+            const auto* ServiceLocator = GameInstance->GetServiceLocator();
 
             if (ServiceLocator->TryGetService(ResourceLoaderService))
             {
                 ResourceLoaderService->OnCharacterConfigLoaded.AddUObject(this, &USTUCharacterMovementComponent::OnCharacterConfigLoaded);
             }
 
-            UEventBusService* EventBus = nullptr;
-            ServiceLocator -> TryGetService(EventBus);
+            ServiceLocator -> TryGetService(TweenService);
 
-            check(EventBus);
+            check(TweenService)
+            check(ResourceLoaderService)
 
-            EventBus -> Subscribe(
-                EventNameConstants::OnStartRun,
-                1,
-                [this]()
-            {
-                 RunStart();
-            });
-
-            EventBus -> Subscribe(
-                EventNameConstants::OnStopRun,
-                2,
-                [this]()
-            {
-                RunEnd();
-            });
+            SUBSCRIBE_EVENT(EventNameConstants::OnStartRun, 1, [this] { RunStart(); });
+            SUBSCRIBE_EVENT(EventNameConstants::OnStopRun, 2, [this] { RunEnd(); });
         }
     } 
 }
