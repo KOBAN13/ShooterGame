@@ -6,6 +6,8 @@
 #include "EventBusService.h"
 #include "EventBusMacros.generated.h"
 
+class UEventBusService;
+
 #define SUBSCRIBE_EVENT(EventName, Priority, Callback) \
     if(UEventBusService* EventBusService = UEventBusService::GetInstance()) \
        EventBusService -> Subscribe(EventName, Priority, Callback); \

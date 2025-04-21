@@ -4,8 +4,6 @@
 
 #include "EventBusService.h"
 #include "EventNameConstants.h"
-#include "STUGameInstance.h"
-#include "ServiceLocatorSubsystem.h"
 
 USTUHealthComponent::USTUHealthComponent()
 {
