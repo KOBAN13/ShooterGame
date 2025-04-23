@@ -23,13 +23,7 @@ void USTUHealthComponent::BeginPlay()
         Owner -> OnTakeAnyDamage.AddDynamic(this, &USTUHealthComponent::OnTakeAnyDamage);
     }
 
-    if (const auto* World = GetWorld())
-    {
-        if (const auto* GameInstance = Cast<USTUGameInstance>(World -> GetGameInstance()))
-        {
-            GameInstance -> GetServiceLocator() -> TryGetService(TweenService);
-        }
-    } 
+    TweenService = TryGetService<UTweenService>(GetWorld());
 }
 
 void USTUHealthComponent::OnTakeAnyDamage(
@@ -48,14 +42,16 @@ void USTUHealthComponent::OnTakeAnyDamage(
     {
         switch (DamageTypeInterface->GetDamageCategory())
         {
-        case EDamageCategory::Fire:
-            UE_LOG(LogHealthComponent, Warning, TEXT("Take Fire Damage"));
+            case EDamageCategory::Fire:
+                UE_LOG(LogHealthComponent, Warning, TEXT("Take Fire Damage"));
             break;
-        case EDamageCategory::Ice:
-            UE_LOG(LogHealthComponent, Warning, TEXT("Take Ice Damage"));
+            
+            case EDamageCategory::Ice:
+                UE_LOG(LogHealthComponent, Warning, TEXT("Take Ice Damage"));
             break;
-        default:
-            break;
+
+            default:
+                break;
         }
     }
 

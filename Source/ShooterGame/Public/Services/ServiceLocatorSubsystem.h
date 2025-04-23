@@ -3,11 +3,29 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "STUGameInstance.h"
 #include "UServiceManager.h"
 #include "Subsystems/GameInstanceSubsystem.h"
 #include "ServiceLocatorSubsystem.generated.h"
 
 class UServiceManager;
+
+template <typename T>
+FORCEINLINE T* TryGetService(UWorld* World)
+{
+    if (World)
+    {
+        if (const auto* GameInstance = Cast<USTUGameInstance>(World->GetGameInstance()))
+        {
+            T* Service = nullptr;
+            UServiceLocatorSubsystem* ServiceLocator = GameInstance -> GetServiceLocator();
+            ServiceLocator -> TryGetService(Service);
+            return Service;
+        }
+    }
+    return nullptr;
+}
+
 UCLASS()
 class SHOOTERGAME_API UServiceLocatorSubsystem : public UGameInstanceSubsystem
 {
