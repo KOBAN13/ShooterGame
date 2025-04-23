@@ -6,6 +6,7 @@
 #include "EventBusMacros.h"
 #include "STUGameInstance.h"
 #include "STUIceDamageType.h"
+#include "ServiceLocatorHelper.h"
 #include "ServiceLocatorSubsystem.h"
 #include "TweenService.h"
 
