@@ -38,6 +38,8 @@ void USTUHealthComponent::OnTakeAnyDamage(
     if (Damage <= 0.0f || IsDead())
         return;
 
+    StartHealthRecoveryTimer();
+
     HealthParameters.Health = FMath::Clamp(HealthParameters.Health - Damage, 0.0f, HealthParameters.MaxHealth);
 
     SEND_EVENT_STRUCT(EventNameConstants::OnHealthChanged, FHealthParameters, &HealthParameters);
@@ -63,35 +65,20 @@ void USTUHealthComponent::OnTakeAnyDamage(
     }
 }
 
-void USTUHealthComponent::RecoveryHealth()
-{
-    TweenService -> TweenKill(TweenId);
-    TweenId = TweenService -> TweenFloat(
-        HealthParameters.Health,
-        HealthParameters.MaxHealth,
-        HealthRecoveryParameters.HealDelay,
-        [this](const float Health)
-        {
-            HealthParameters.Health = Health;
-            SEND_EVENT_STRUCT(EventNameConstants::OnHealthChanged, FHealthParameters, &HealthParameters);
-        }
-    );
-}
-
 void USTUHealthComponent::StartHealthRecoveryTimer()
 {
-    if(HealthRecoveryParameters.IsAutoHeal || HealthParameters.Health >= HealthParameters.MaxHealth)
+    if(!HealthRecoveryParameters.IsAutoHeal || HealthParameters.Health >= HealthParameters.MaxHealth)
         return;
+
+    TweenService -> SteppedTweenKill(TweenId);
     
-    FTimerManager& TimerManager = GetWorld() -> GetTimerManager();
-    TimerManager.ClearTimer(RecoveryTimerHandle);
-    
-    TimerManager.SetTimer(
-        RecoveryTimerHandle,
-        this,
-        &USTUHealthComponent::RecoveryHealth,
+    TweenId = TweenService -> SteppedTweenFloat(
+        HealthParameters.Health,
+        HealthParameters.MaxHealth,
+        HealthRecoveryParameters.HealModifier,
+        HealthRecoveryParameters.HealUpdateTime,
         HealthRecoveryParameters.HealDelay,
-        true
-    );
+        [this](float Value) { SEND_EVENT(EventNameConstants::OnHealthChanged) }
+        );
 }
 

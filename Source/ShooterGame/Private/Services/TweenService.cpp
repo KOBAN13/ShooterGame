@@ -5,6 +5,7 @@
 UTweenService::UTweenService()
 {
     ActiveTweens = TArray<FTweenData>();
+    ActiveSteppedTweens = TArray<FSteppedTweenData>();
 }
 
 int32 UTweenService::TweenFloat(
@@ -15,6 +16,8 @@ int32 UTweenService::TweenFloat(
     const TFunction<void()>& OnComplete
 )
 {
+    auto SafeOnComplete = OnComplete ? OnComplete : []() {};
+    
     ActiveTweens.Add(FTweenData{Start, End, Duration, 0.0f, NextTweenId++, OnUpdate, OnComplete});
 
     return NextTweenId;
@@ -25,11 +28,14 @@ int32 UTweenService::SteppedTweenFloat(
     const float EndValue,
     const float StepSize,
     const float StepInterval,
-    const TFunction<void(float)>& OnUpdate,
     const float InitialDelay,
+    const TFunction<void(float)>& OnUpdate,
     const TFunction<void()>& OnComplete
 )
 {
+    auto SafeOnUpdate = OnUpdate ? OnUpdate : [](float Value) {};
+    auto SafeOnComplete = OnComplete ? OnComplete : []() {};
+    
     ActiveSteppedTweens.Add(FSteppedTweenData{StartValue, EndValue, StepSize, StepInterval, InitialDelay, NextTweenId++, OnUpdate, OnComplete});
     SteppedTweenStart(NextTweenId);
     return NextTweenId; 
@@ -75,11 +81,7 @@ void UTweenService::Tick(float DeltaTime)
 
         if (Tween.Elapsed >= Tween.Duration && Tween.OnComplete)
         {
-            if (Tween.OnComplete != nullptr)
-            {
-                Tween.OnComplete();
-            }
-
+            Tween.OnComplete();
             ActiveTweens.RemoveAt(i);
         }
     }

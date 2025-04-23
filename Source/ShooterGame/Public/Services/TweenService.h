@@ -14,15 +14,20 @@ public:
     UTweenService();
 
     int32 TweenFloat(
-        float Start, float End, float Duration, const TFunction<void(float)>& OnUpdate, const TFunction<void()>& OnComplete = nullptr);
+        float Start,
+        float End,
+        float Duration,
+        const TFunction<void(float)>& OnUpdate,
+        const TFunction<void()>& OnComplete = nullptr
+    );
 
     int32 SteppedTweenFloat(
         float StartValue,
         float EndValue,
         float StepSize,
         float StepInterval,
-        const TFunction<void(float)>& OnUpdate,
         float InitialDelay = 0.0f,
+        const TFunction<void(float)>& OnUpdate = nullptr,
         const TFunction<void()>& OnComplete = nullptr
     );
 
