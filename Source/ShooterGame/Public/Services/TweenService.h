@@ -14,14 +14,20 @@ public:
     UTweenService();
 
     int32 TweenFloat(
-        float Start,
-        float End,
-        float Duration,
+        float Start, float End, float Duration, const TFunction<void(float)>& OnUpdate, const TFunction<void()>& OnComplete = nullptr);
+
+    int32 SteppedTweenFloat(
+        float StartValue,
+        float EndValue,
+        float StepSize,
+        float StepInterval,
         const TFunction<void(float)>& OnUpdate,
+        float InitialDelay = 0.0f,
         const TFunction<void()>& OnComplete = nullptr
     );
-    
+
     void TweenKill(int32 IdTween);
+    void SteppedTweenKill(int32 IdTween);
 
     virtual void Tick(float DeltaTime) override;
     virtual bool IsTickable() const override { return true; }
@@ -40,7 +46,28 @@ private:
         TFunction<void(float)> OnUpdate;
         TFunction<void()> OnComplete;
     };
+
+    struct FSteppedTweenData
+    {
+        float StartValue;
+        float EndValue;
+        float StepSize;
+        float StepInterval;
+        float InitialDelay;
+        int32 Id;       
+        const TFunction<void(float)>& OnUpdate;
+        const TFunction<void()>& OnComplete;
+    }; 
+    
     int32 NextTweenId = 0;
 
     TArray<FTweenData> ActiveTweens;
+    TArray<FSteppedTweenData> ActiveSteppedTweens;
+
+    FTimerHandle DelayTimer;
+    FTimerHandle StepTimer;
+
+    void SteppedTweenStart(int32 IdTween);
+    void ApplySteppedTween(FSteppedTweenData& SteppedTween);
+    static bool IsSteppedTweenComplete(const FSteppedTweenData& SteppedTween);
 };

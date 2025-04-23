@@ -7,7 +7,6 @@
 #include "GameFramework/Character.h"
 #include "STUBaseCharacter.generated.h"
 
-struct FHealthParameters;
 class UTextRenderComponent;
 class USTUHealthComponent;
 class UCharacterConfig;
@@ -16,6 +15,8 @@ class USpringArmComponent;
 class UServiceLocatorSubsystem;
 class UEventBusService;
 class USTUCharacterMovementComponent;
+
+struct FHealthParameters;
 
 DEFINE_LOG_CATEGORY_STATIC(LogBaseCharacter, All, All);
 

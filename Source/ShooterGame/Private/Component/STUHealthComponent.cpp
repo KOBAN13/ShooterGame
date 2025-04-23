@@ -7,6 +7,7 @@
 #include "STUGameInstance.h"
 #include "STUIceDamageType.h"
 #include "ServiceLocatorSubsystem.h"
+#include "TweenService.h"
 
 USTUHealthComponent::USTUHealthComponent()
 {
@@ -62,14 +63,30 @@ void USTUHealthComponent::OnTakeAnyDamage(
     }
 }
 
-void USTUHealthComponent::RecoveryHealth() const
+void USTUHealthComponent::RecoveryHealth()
 {
-    
+    TweenService -> TweenKill(TweenId);
+    TweenId = TweenService -> TweenFloat(
+        HealthParameters.Health,
+        HealthParameters.MaxHealth,
+        HealthRecoveryParameters.HealDelay,
+        [this](const float Health)
+        {
+            HealthParameters.Health = Health;
+            SEND_EVENT_STRUCT(EventNameConstants::OnHealthChanged, FHealthParameters, &HealthParameters);
+        }
+    );
 }
 
 void USTUHealthComponent::StartHealthRecoveryTimer()
 {
-    GetWorld() -> GetTimerManager().SetTimer(
+    if(HealthRecoveryParameters.IsAutoHeal || HealthParameters.Health >= HealthParameters.MaxHealth)
+        return;
+    
+    FTimerManager& TimerManager = GetWorld() -> GetTimerManager();
+    TimerManager.ClearTimer(RecoveryTimerHandle);
+    
+    TimerManager.SetTimer(
         RecoveryTimerHandle,
         this,
         &USTUHealthComponent::RecoveryHealth,

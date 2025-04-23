@@ -15,7 +15,7 @@ class UServiceLocatorSubsystem;
 UCLASS()
 class SHOOTERGAME_API USTUCharacterMovementComponent : public UCharacterMovementComponent
 {
-	GENERATED_BODY()
+    GENERATED_BODY()
 
     UPROPERTY()
     UCharacterConfig* CharacterConfig;

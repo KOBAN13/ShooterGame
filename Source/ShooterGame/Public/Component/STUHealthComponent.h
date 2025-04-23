@@ -45,8 +45,12 @@ protected:
 
 private:
     FTimerHandle RecoveryTimerHandle;
+
+    UPROPERTY()
     UTweenService* TweenService;
 
-    void RecoveryHealth() const;
+    int32 TweenId;
+
+    void RecoveryHealth();
     void StartHealthRecoveryTimer();
 };
