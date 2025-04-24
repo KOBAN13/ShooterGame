@@ -16,9 +16,9 @@ int32 UTweenService::TweenFloat(
     const TFunction<void()>& OnComplete
 )
 {
-    auto SafeOnComplete = OnComplete ? OnComplete : []() {};
+    const auto SafeOnComplete = OnComplete ? OnComplete : []() {};
     
-    ActiveTweens.Add(FTweenData{Start, End, Duration, 0.0f, NextTweenId++, OnUpdate, OnComplete});
+    ActiveTweens.Add(FTweenData{Start, End, Duration, 0.0f, NextTweenId++, OnUpdate, SafeOnComplete});
 
     return NextTweenId;
 }
@@ -33,10 +33,10 @@ int32 UTweenService::SteppedTweenFloat(
     const TFunction<void()>& OnComplete
 )
 {
-    auto SafeOnUpdate = OnUpdate ? OnUpdate : [](float Value) {};
-    auto SafeOnComplete = OnComplete ? OnComplete : []() {};
+    const auto SafeOnUpdate = OnUpdate ? OnUpdate : [](float Value) {};
+    const auto SafeOnComplete = OnComplete ? OnComplete : []() {};
     
-    ActiveSteppedTweens.Add(FSteppedTweenData{StartValue, EndValue, StepSize, StepInterval, InitialDelay, NextTweenId++, OnUpdate, OnComplete});
+    ActiveSteppedTweens.Add(FSteppedTweenData{StartValue, EndValue, StepSize, StepInterval, InitialDelay, NextTweenId++, SafeOnUpdate, SafeOnComplete});
     SteppedTweenStart(ActiveSteppedTweens.Last());
     return NextTweenId; 
 }
@@ -94,10 +94,7 @@ void UTweenService::SteppedTweenStart(FSteppedTweenData& SteppedTween)
 
     if (SteppedTween.InitialDelay > 0.0f)
     {
-        UWorld* World = GetWorld();
-        FTimerManager &TimerManager = World -> GetTimerManager();
-        
-        TimerManager
+        GetWorld() -> GetTimerManager()
         .SetTimer(
             DelayTimer,
             [this, &SteppedTween]() { ApplySteppedTween(SteppedTween); },
@@ -142,10 +139,8 @@ void UTweenService::ApplySteppedTween(FSteppedTweenData& SteppedTween)
 
     SteppedTween.OnUpdate(SteppedTween.StartValue);
 
-    UWorld* World = GetWorld();
-    FTimerManager &TimerManager = World -> GetTimerManager();
-    
-    TimerManager.SetTimer(
+    GetWorld() -> GetTimerManager()
+    .SetTimer(
         StepTimer,
         [this, &SteppedTween]() { ApplySteppedTween(SteppedTween); },
         SteppedTween.StepInterval,

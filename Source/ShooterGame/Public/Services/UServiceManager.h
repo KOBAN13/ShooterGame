@@ -33,7 +33,7 @@ public:
     }
 
     template <typename T = UClass>
-    void RegisterService(TSubclassOf<T> ServiceClass)
+    void RegisterService(UWorld* World, TSubclassOf<T> ServiceClass)
     {
         if(ServiceClass == nullptr)
             return;
@@ -46,7 +46,7 @@ public:
         }
         else
         {
-            T* Instance = NewObject<T>(this, ServiceClass);
+            T* Instance = NewObject<T>(World, ServiceClass);
             Services.Add(Class, TWeakObjectPtr<>(Instance));
             UE_LOG(LogTemp, Warning, TEXT("Service registered {%s}"), *ServiceClass->GetName());
         }

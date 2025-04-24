@@ -25,9 +25,9 @@ public:
     }
 
     template <typename T = UClass>
-    void RegisterService(TSubclassOf<T> ServiceClass) const
+    void RegisterService(UWorld* World, TSubclassOf<T> ServiceClass) const
     {
-        ServiceManager -> RegisterService(ServiceClass);
+        ServiceManager -> RegisterService(World, ServiceClass);
     }
 
     template <typename T = UClass>
