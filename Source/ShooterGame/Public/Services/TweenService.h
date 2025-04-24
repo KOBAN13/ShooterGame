@@ -72,7 +72,7 @@ private:
     FTimerHandle DelayTimer;
     FTimerHandle StepTimer;
 
-    void SteppedTweenStart(int32 IdTween);
+    void SteppedTweenStart(FSteppedTweenData& SteppedTween);
     void ApplySteppedTween(FSteppedTweenData& SteppedTween);
     static bool IsSteppedTweenComplete(const FSteppedTweenData& SteppedTween);
 };

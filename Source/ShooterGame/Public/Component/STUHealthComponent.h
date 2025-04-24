@@ -45,12 +45,10 @@ protected:
 
 private:
     FTimerHandle RecoveryTimerHandle;
-
-    UPROPERTY()
-    UTweenService* TweenService;
+    
+    TWeakObjectPtr<UTweenService> TweenService;
 
     int32 TweenId;
-
-    void RecoveryHealth();
+    
     void StartHealthRecoveryTimer();
 };

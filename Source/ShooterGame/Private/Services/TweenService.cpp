@@ -37,7 +37,7 @@ int32 UTweenService::SteppedTweenFloat(
     auto SafeOnComplete = OnComplete ? OnComplete : []() {};
     
     ActiveSteppedTweens.Add(FSteppedTweenData{StartValue, EndValue, StepSize, StepInterval, InitialDelay, NextTweenId++, OnUpdate, OnComplete});
-    SteppedTweenStart(NextTweenId);
+    SteppedTweenStart(ActiveSteppedTweens.Last());
     return NextTweenId; 
 }
 
@@ -87,16 +87,17 @@ void UTweenService::Tick(float DeltaTime)
     }
 }
 
-void UTweenService::SteppedTweenStart(int32 IdTween)
+void UTweenService::SteppedTweenStart(FSteppedTweenData& SteppedTween)
 {
-    auto& SteppedTween = ActiveSteppedTweens[IdTween];
-
     if (FMath::IsNearlyEqual(SteppedTween.StartValue, SteppedTween.EndValue, 0.01f))
         return;
 
     if (SteppedTween.InitialDelay > 0.0f)
     {
-        GetWorld()->GetTimerManager()
+        UWorld* World = GetWorld();
+        FTimerManager &TimerManager = World -> GetTimerManager();
+        
+        TimerManager
         .SetTimer(
             DelayTimer,
             [this, &SteppedTween]() { ApplySteppedTween(SteppedTween); },
@@ -141,8 +142,15 @@ void UTweenService::ApplySteppedTween(FSteppedTweenData& SteppedTween)
 
     SteppedTween.OnUpdate(SteppedTween.StartValue);
 
-    GetWorld()->GetTimerManager().SetTimer(
-        StepTimer, [this, &SteppedTween]() { ApplySteppedTween(SteppedTween); }, SteppedTween.StepInterval, false);
+    UWorld* World = GetWorld();
+    FTimerManager &TimerManager = World -> GetTimerManager();
+    
+    TimerManager.SetTimer(
+        StepTimer,
+        [this, &SteppedTween]() { ApplySteppedTween(SteppedTween); },
+        SteppedTween.StepInterval,
+        false
+    );
 }
 
 bool UTweenService::IsSteppedTweenComplete(const FSteppedTweenData& SteppedTween)

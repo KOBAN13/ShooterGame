@@ -75,7 +75,11 @@ void USTUHealthComponent::StartHealthRecoveryTimer()
         HealthRecoveryParameters.HealModifier,
         HealthRecoveryParameters.HealUpdateTime,
         HealthRecoveryParameters.HealDelay,
-        [this](float Value) { SEND_EVENT(EventNameConstants::OnHealthChanged) }
+        [this](float Value)
+        {
+            SEND_EVENT(EventNameConstants::OnHealthChanged);
+            GEngine -> AddOnScreenDebugMessage(-1, 1.0f, FColor::Red, TEXT("Health: ") + FString::SanitizeFloat(Value));
+        }
         );
 }
 
