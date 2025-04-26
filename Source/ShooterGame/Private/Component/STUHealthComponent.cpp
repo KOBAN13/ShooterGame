@@ -59,6 +59,7 @@ void USTUHealthComponent::OnTakeAnyDamage(
     if (IsDead())
     {
         SEND_EVENT(EventNameConstants::OnCharacterDead);
+        TweenService -> SteppedTweenKill(TweenId);
     }
 }
 
@@ -75,10 +76,11 @@ void USTUHealthComponent::StartHealthRecoveryTimer()
         HealthRecoveryParameters.HealModifier,
         HealthRecoveryParameters.HealUpdateTime,
         HealthRecoveryParameters.HealDelay,
-        [this](float Value)
+        [this](const float Health)
         {
-            SEND_EVENT(EventNameConstants::OnHealthChanged);
-            GEngine -> AddOnScreenDebugMessage(-1, 1.0f, FColor::Red, TEXT("Health: ") + FString::SanitizeFloat(Value));
+            HealthParameters.Health = Health;
+            SEND_EVENT_STRUCT(EventNameConstants::OnHealthChanged, FHealthParameters, &HealthParameters);
+            GEngine -> AddOnScreenDebugMessage(-1, 1.0f, FColor::Red, TEXT("Health: ") + FString::SanitizeFloat(Health));
         }
         );
 }

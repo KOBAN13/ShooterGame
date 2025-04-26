@@ -48,8 +48,8 @@ private:
         float Duration;
         float Elapsed;
         int32 Id;
-        TFunction<void(float)> OnUpdate;
-        TFunction<void()> OnComplete;
+        const TFunction<void(float)> OnUpdate;
+        const TFunction<void()> OnComplete;
     };
 
     struct FSteppedTweenData
@@ -59,9 +59,11 @@ private:
         float StepSize;
         float StepInterval;
         float InitialDelay;
-        int32 Id;       
-        const TFunction<void(float)>& OnUpdate;
-        const TFunction<void()>& OnComplete;
+        int32 Id;
+        FTimerHandle DelayTimer;
+        FTimerHandle StepTimer;
+        const TFunction<void(float)> OnUpdate;
+        const TFunction<void()> OnComplete;
     }; 
     
     int32 NextTweenId = 0;
@@ -69,10 +71,8 @@ private:
     TArray<FTweenData> ActiveTweens;
     TArray<FSteppedTweenData> ActiveSteppedTweens;
 
-    FTimerHandle DelayTimer;
-    FTimerHandle StepTimer;
-
     void SteppedTweenStart(FSteppedTweenData& SteppedTween);
     void ApplySteppedTween(FSteppedTweenData& SteppedTween);
     static bool IsSteppedTweenComplete(const FSteppedTweenData& SteppedTween);
+    FSteppedTweenData* FindSteppedTweenIndex(int32 IdTween);
 };
