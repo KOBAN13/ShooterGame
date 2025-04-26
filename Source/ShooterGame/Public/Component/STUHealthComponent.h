@@ -29,7 +29,7 @@ public:
     virtual float GetHealth() const override { return HealthParameters.Health; }
 
     UFUNCTION(BlueprintCallable)
-    virtual bool IsDead() const override { return HealthParameters.Health <= 0.0f; }
+    virtual bool IsDead() const override { return FMath::IsNearlyZero(HealthParameters.Health); }
 
 protected:
 	virtual void BeginPlay() override;

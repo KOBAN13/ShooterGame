@@ -1,7 +1,7 @@
 // Shoot Then Up Game, All Rights Reserved
 
 #include "STUBaseCharacter.h"
-
+#include "Engine/DamageEvents.h"
 #include "EventBusMacros.h"
 #include "EventNameConstants.h"
 #include "STUCharacterMovementComponent.h"
@@ -70,6 +70,8 @@ void ASTUBaseCharacter::BeginPlay()
         FHealthParameters,
         [this](const FHealthParameters* Health) { OnHealthChanged(*Health); }
     );
+
+    LandedDelegate.AddDynamic(this, &ASTUBaseCharacter::OnGroundedLanded);
 }
 
 void ASTUBaseCharacter::MoveForward(float Amount)
@@ -153,4 +155,18 @@ void ASTUBaseCharacter::OnDeath()
 void ASTUBaseCharacter::OnHealthChanged(const FHealthParameters HealthParameters) const
 {
     HealthTextComponent->SetText(FText::FromString(FString::Printf(TEXT("%.0f"), HealthParameters.Health)));
+}
+
+void ASTUBaseCharacter::OnGroundedLanded(const FHitResult& Hit)
+{
+    const auto FallVelocityZ = GetVelocity().Z;
+
+    UE_LOG(LogBaseCharacter, Warning, TEXT("FallVelocityZ: %f"), FallVelocityZ);
+
+    if(-FallVelocityZ < LandedDamageVelocity.X)
+        return;
+
+    const auto FinalDamage = FMath::GetMappedRangeValueClamped(LandedDamageVelocity, LandedDamage, -FallVelocityZ);
+
+    TakeDamage(FinalDamage, FDamageEvent{}, nullptr, nullptr);
 }

@@ -33,9 +33,9 @@ void USTUHealthComponent::OnTakeAnyDamage(
     if (Damage <= 0.0f || IsDead())
         return;
 
-    StartHealthRecoveryTimer();
-
     HealthParameters.Health = FMath::Clamp(HealthParameters.Health - Damage, 0.0f, HealthParameters.MaxHealth);
+
+    StartHealthRecoveryTimer();
 
     SEND_EVENT_STRUCT(EventNameConstants::OnHealthChanged, FHealthParameters, &HealthParameters);
 
