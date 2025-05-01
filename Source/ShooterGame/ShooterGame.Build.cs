@@ -21,7 +21,8 @@ public class ShooterGame : ModuleRules
 			"ShooterGame/Public/Component",
 			"ShooterGame/Public/Services/EventBus",
 			"ShooterGame/Public/Dev/",
-			"ShooterGame/Public/Dev/DamageType"
+			"ShooterGame/Public/Dev/DamageType",
+			"ShooterGame/Public/Weapon",
 		});
 
 		// Uncomment if you are using Slate UI

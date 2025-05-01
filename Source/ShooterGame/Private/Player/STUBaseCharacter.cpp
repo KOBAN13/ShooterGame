@@ -13,6 +13,7 @@
 #include "STUHealthComponent.h"
 #include "Components/TextRenderComponent.h"
 #include "GameFramework/Controller.h"
+#include "STUBaseWeapon.h"
 
 ASTUBaseCharacter::ASTUBaseCharacter(const FObjectInitializer &ObjectInitializer)
 : Super(ObjectInitializer.SetDefaultSubobjectClass<USTUCharacterMovementComponent>(CharacterMovementComponentName))
@@ -72,6 +73,8 @@ void ASTUBaseCharacter::BeginPlay()
     );
 
     LandedDelegate.AddDynamic(this, &ASTUBaseCharacter::OnGroundedLanded);
+
+    CreateWeapon();
 }
 
 void ASTUBaseCharacter::MoveForward(float Amount)
@@ -163,10 +166,24 @@ void ASTUBaseCharacter::OnGroundedLanded(const FHitResult& Hit)
 
     UE_LOG(LogBaseCharacter, Warning, TEXT("FallVelocityZ: %f"), FallVelocityZ);
 
-    if(-FallVelocityZ < LandedDamageVelocity.X)
+    if (-FallVelocityZ < LandedDamageVelocity.X)
         return;
 
     const auto FinalDamage = FMath::GetMappedRangeValueClamped(LandedDamageVelocity, LandedDamage, -FallVelocityZ);
 
     TakeDamage(FinalDamage, FDamageEvent{}, nullptr, nullptr);
+}
+
+void ASTUBaseCharacter::CreateWeapon()
+{
+    auto* World = GetWorld();
+    
+    if(!World)
+        return;
+
+    const auto Weapon = World -> SpawnActor<ASTUBaseWeapon>(WeaponClass);
+
+    FAttachmentTransformRules AttachmentRules(EAttachmentRule::SnapToTarget, false);
+
+    Weapon -> AttachToComponent(GetMesh(), AttachmentRules, "WeaponSocket");
 }
