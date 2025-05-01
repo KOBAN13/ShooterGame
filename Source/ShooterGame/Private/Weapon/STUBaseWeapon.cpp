@@ -3,10 +3,9 @@
 #include "STUBaseWeapon.h"
 #include "Components/SkeletalMeshComponent.h"
 
-// Sets default values
 ASTUBaseWeapon::ASTUBaseWeapon()
 {
-	PrimaryActorTick.bCanEverTick = false;
+    PrimaryActorTick.bCanEverTick = false;
 
     WeaponMeshComponent = CreateDefaultSubobject<USkeletalMeshComponent>("WeaponMesh");
     SetRootComponent(WeaponMeshComponent);
@@ -15,6 +14,10 @@ ASTUBaseWeapon::ASTUBaseWeapon()
 void ASTUBaseWeapon::BeginPlay()
 {
 	Super::BeginPlay();
-	
+}
+
+void ASTUBaseWeapon::Fire()
+{
+    UE_LOG(LogBaseWeapon, Warning, TEXT("Fire"));
 }
 

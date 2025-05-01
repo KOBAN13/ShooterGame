@@ -6,6 +6,8 @@
 #include "GameFramework/Actor.h"
 #include "STUBaseWeapon.generated.h"
 
+DECLARE_LOG_CATEGORY_CLASS(LogBaseWeapon, All, All);
+
 class USkeletalMeshComponent;
 
 UCLASS()
@@ -15,6 +17,8 @@ class SHOOTERGAME_API ASTUBaseWeapon : public AActor
 	
 public:	
 	ASTUBaseWeapon();
+
+    virtual void Fire();
 
 protected:
     UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Components")

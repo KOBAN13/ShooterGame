@@ -13,7 +13,7 @@
 #include "STUHealthComponent.h"
 #include "Components/TextRenderComponent.h"
 #include "GameFramework/Controller.h"
-#include "STUBaseWeapon.h"
+#include "STUWeaponComponent.h"
 
 ASTUBaseCharacter::ASTUBaseCharacter(const FObjectInitializer &ObjectInitializer)
 : Super(ObjectInitializer.SetDefaultSubobjectClass<USTUCharacterMovementComponent>(CharacterMovementComponentName))
@@ -61,6 +61,7 @@ void ASTUBaseCharacter::BeginPlay()
 
     check(HealthTextComponent)
     check(HealthComponent)
+    check(WeaponComponent)
     check(CharacterMovementComponent)
     
     SUBSCRIBE_EVENT(EventNameConstants::OnCharacterDead, 1, [this]() { OnDeath(); });
@@ -73,8 +74,6 @@ void ASTUBaseCharacter::BeginPlay()
     );
 
     LandedDelegate.AddDynamic(this, &ASTUBaseCharacter::OnGroundedLanded);
-
-    CreateWeapon();
 }
 
 void ASTUBaseCharacter::MoveForward(float Amount)
@@ -110,6 +109,7 @@ void ASTUBaseCharacter::BindInputAxis(UInputComponent* PlayerInputComponent)
     PlayerInputComponent->BindAction("Jump", IE_Pressed, this, &ASTUBaseCharacter::Jump);
     PlayerInputComponent->BindAction("RunStart", IE_Pressed, this, &ASTUBaseCharacter::RunStart);
     PlayerInputComponent->BindAction("RunEnd", IE_Released, this, &ASTUBaseCharacter::RunEnd);
+    PlayerInputComponent->BindAction("Fire", IE_Pressed, WeaponComponent, &USTUWeaponComponent::Fire);
 }
 
 void ASTUBaseCharacter::CreateComponentsAndAttach()
@@ -122,6 +122,8 @@ void ASTUBaseCharacter::CreateComponentsAndAttach()
     CameraComponent -> SetupAttachment(SpringArmComponent);
 
     HealthComponent = CreateDefaultSubobject<USTUHealthComponent>("HealthComponent");
+
+    WeaponComponent = CreateDefaultSubobject<USTUWeaponComponent>("WeaponComponent");
 
     HealthTextComponent = CreateDefaultSubobject<UTextRenderComponent>("HealthTextRenderer");
     HealthTextComponent -> SetupAttachment(GetRootComponent());
@@ -172,18 +174,4 @@ void ASTUBaseCharacter::OnGroundedLanded(const FHitResult& Hit)
     const auto FinalDamage = FMath::GetMappedRangeValueClamped(LandedDamageVelocity, LandedDamage, -FallVelocityZ);
 
     TakeDamage(FinalDamage, FDamageEvent{}, nullptr, nullptr);
-}
-
-void ASTUBaseCharacter::CreateWeapon() const
-{
-    auto* World = GetWorld();
-    
-    if(!World)
-        return;
-
-    const auto Weapon = World->SpawnActor<ASTUBaseWeapon>(WeaponClass);
-
-    const FAttachmentTransformRules AttachmentRules(EAttachmentRule::SnapToTarget, false);
-
-    Weapon -> AttachToComponent(GetMesh(), AttachmentRules, "WeaponSocket");
 }

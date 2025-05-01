@@ -7,7 +7,7 @@
 #include "GameFramework/Character.h"
 #include "STUBaseCharacter.generated.h"
 
-class ASTUBaseWeapon;
+class USTUWeaponComponent;
 class UTextRenderComponent;
 class USTUHealthComponent;
 class UCharacterConfig;
@@ -40,6 +40,9 @@ public:
     USTUHealthComponent* HealthComponent;
 
     UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Components")
+    USTUWeaponComponent* WeaponComponent;
+
+    UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Components")
     UTextRenderComponent* HealthTextComponent;
 
     UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Animation")
@@ -53,9 +56,6 @@ public:
 
     UPROPERTY(EditDefaultsOnly, Category = "Damage")
     FVector2D LandedDamage = FVector2D(10.0f, 100.0f);
-
-    UPROPERTY(EditDefaultsOnly, Category = "Weapon")
-    TSubclassOf<ASTUBaseWeapon> WeaponClass;
     
 private:
     bool bIsWalk = false;
@@ -88,6 +88,4 @@ private:
 
     UFUNCTION()
     void OnGroundedLanded(const FHitResult& Hit);
-
-    void CreateWeapon() const;
 };
