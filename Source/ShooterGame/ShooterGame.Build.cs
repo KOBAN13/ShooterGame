@@ -23,6 +23,7 @@ public class ShooterGame : ModuleRules
 			"ShooterGame/Public/Dev/",
 			"ShooterGame/Public/Dev/DamageType",
 			"ShooterGame/Public/Weapon",
+			"ShooterGame/Public/UI",
 		});
 
 		// Uncomment if you are using Slate UI

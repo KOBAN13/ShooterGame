@@ -89,5 +89,5 @@ private:
     UFUNCTION()
     void OnGroundedLanded(const FHitResult& Hit);
 
-    void CreateWeapon();
+    void CreateWeapon() const;
 };

@@ -174,16 +174,16 @@ void ASTUBaseCharacter::OnGroundedLanded(const FHitResult& Hit)
     TakeDamage(FinalDamage, FDamageEvent{}, nullptr, nullptr);
 }
 
-void ASTUBaseCharacter::CreateWeapon()
+void ASTUBaseCharacter::CreateWeapon() const
 {
     auto* World = GetWorld();
     
     if(!World)
         return;
 
-    const auto Weapon = World -> SpawnActor<ASTUBaseWeapon>(WeaponClass);
+    const auto Weapon = World->SpawnActor<ASTUBaseWeapon>(WeaponClass);
 
-    FAttachmentTransformRules AttachmentRules(EAttachmentRule::SnapToTarget, false);
+    const FAttachmentTransformRules AttachmentRules(EAttachmentRule::SnapToTarget, false);
 
     Weapon -> AttachToComponent(GetMesh(), AttachmentRules, "WeaponSocket");
 }
