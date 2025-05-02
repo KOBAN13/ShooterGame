@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "BaseEventBus.h"
 #include "FCallbackWithPriorityStruct.h"
 #include "FCallbackWithPriorityObject.h"
 #include "EventBusService.generated.h"
@@ -11,7 +12,7 @@ struct FCallbackWithPriorityObject;
 struct FCallbackWithPriorityStruct;
 
 UCLASS()
-class SHOOTERGAME_API UEventBusService : public UObject
+class SHOOTERGAME_API UEventBusService : public UBaseEventBus
 {
     GENERATED_BODY()
 
@@ -30,7 +31,6 @@ public:
     static void Shutdown();
 
     virtual void BeginDestroy() override;
-
     
     template<typename TEvent>
     void Subscribe(const FName EventName, const int32 Priority, const TFunction<void(TEvent*)>& Callback)
