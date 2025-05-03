@@ -3,9 +3,10 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "EventVisitor.h"
 #include "BaseEventBus.generated.h"
 
-UCLASS()
+UCLASS(Abstract)
 class SHOOTERGAME_API UBaseEventBus : public UObject
 {
 	GENERATED_BODY()
@@ -23,4 +24,6 @@ class SHOOTERGAME_API UBaseEventBus : public UObject
         void* EventObject = nullptr,
         UScriptStruct* StructType = nullptr
     );
+
+    virtual void Accept(IEventVisitor* Visitor);
 };
