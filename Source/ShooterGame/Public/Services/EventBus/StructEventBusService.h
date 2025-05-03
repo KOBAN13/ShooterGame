@@ -30,8 +30,7 @@ public:
     
     virtual void SendEvent(
         const FName EventName,
-        void* EventObject,
-        UScriptStruct* StructType
+        void* EventObject
     ) override;
 
     

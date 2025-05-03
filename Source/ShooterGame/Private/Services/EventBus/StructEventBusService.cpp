@@ -32,21 +32,27 @@ void UStructEventBusService::Unsubscribe(const FName EventName)
 
 void UStructEventBusService::SendEvent(
     const FName EventName,
-    void* EventObject,
-    UScriptStruct* StructType
+    void* EventObject
 )
 {
+    UScriptStruct* EventObjectCast = nullptr;
+    
     if(!EventReceiversStruct.Contains(EventName))
         return;
 
-    if(EventObject == nullptr || StructType == nullptr)
-        return;
+    if(EventObjectCast != nullptr)
+    {
+        EventObjectCast = Cast<UScriptStruct>(EventObject);
+
+        if(EventObjectCast == nullptr)
+            return;
+    }
 
     for(const auto& Receiver : EventReceiversStruct[EventName])
     {
         if(Receiver.IsValid())
         {
-            Receiver->StructDelegate.ExecuteIfBound(StructType, EventObject);
+            Receiver->StructDelegate.ExecuteIfBound(EventObjectCast, EventObject);
         }
     }
 }

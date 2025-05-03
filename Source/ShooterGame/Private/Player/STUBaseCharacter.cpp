@@ -7,13 +7,14 @@
 #include "STUCharacterMovementComponent.h"
 #include "Camera/CameraComponent.h"
 #include "Components/InputComponent.h"
-#include "EventBusService.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "STUHealthComponent.h"
 #include "Components/TextRenderComponent.h"
 #include "GameFramework/Controller.h"
 #include "STUWeaponComponent.h"
+#include "StructEventBusService.h"
+#include "VoidEventBusService.h"
 
 ASTUBaseCharacter::ASTUBaseCharacter(const FObjectInitializer &ObjectInitializer)
 : Super(ObjectInitializer.SetDefaultSubobjectClass<USTUCharacterMovementComponent>(CharacterMovementComponentName))
@@ -63,15 +64,9 @@ void ASTUBaseCharacter::BeginPlay()
     check(HealthComponent)
     check(WeaponComponent)
     check(CharacterMovementComponent)
-    
-    SUBSCRIBE_EVENT(EventNameConstants::OnCharacterDead, 1, [this]() { OnDeath(); });
-    
-    SUBSCRIBE_STRUCT_EVENT(
-        EventNameConstants::OnHealthChanged,
-        1,
-        FHealthParameters,
-        [this](const FHealthParameters* Health) { OnHealthChanged(*Health); }
-    );
+
+    Subscribe<UObjectEventBusService>(EventNameConstants::OnStartRun, 1, [this](void*) { RunStart(); }, GetWorld());
+    Subscribe<FHealthParameters, UStructEventBusService>(EventNameConstants::OnHealthChanged, 1, [this](FHealthParameters* Health) { OnHealthChanged(*Health);}, GetWorld());
 
     LandedDelegate.AddDynamic(this, &ASTUBaseCharacter::OnGroundedLanded);
 }
@@ -132,15 +127,15 @@ void ASTUBaseCharacter::CreateComponentsAndAttach()
 void ASTUBaseCharacter::RunStart()
 {
     bIsRun = true;
-    
-    SEND_EVENT(EventNameConstants::OnStartRun);
+
+    SendEvent<UVoidEventBusService>(EventNameConstants::OnStartRun, GetWorld());
 }
 
 void ASTUBaseCharacter::RunEnd()
 {
     bIsRun = false;
 
-    SEND_EVENT(EventNameConstants::OnStopRun);
+    SendEvent<UVoidEventBusService>(EventNameConstants::OnStopRun, GetWorld());
 }
 
 void ASTUBaseCharacter::OnDeath()

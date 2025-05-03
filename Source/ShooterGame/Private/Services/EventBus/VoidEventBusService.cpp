@@ -31,8 +31,7 @@ void UVoidEventBusService::Unsubscribe(const FName EventName)
 
 void UVoidEventBusService::SendEvent(
     const FName EventName,
-    void* EventObject,
-    UScriptStruct* StructType
+    void* EventObject
 )
 {
     if (!EventReceiversVoid.Contains(EventName))

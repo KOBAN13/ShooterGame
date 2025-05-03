@@ -68,8 +68,8 @@ void USTUCharacterMovementComponent::Initialize()
             check(TweenService)
             check(ResourceLoaderService)
 
-            SUBSCRIBE_EVENT(EventNameConstants::OnStartRun, 1, [this] { RunStart(); });
-            SUBSCRIBE_EVENT(EventNameConstants::OnStopRun, 2, [this] { RunEnd(); });
+            Subscribe<void, UObjectEventBusService>(EventNameConstants::OnStartRun, 1, [this](void*) { RunStart(); }, World);
+            Subscribe<void, UObjectEventBusService>(EventNameConstants::OnStopRun, 1, [this](void*) { RunEnd(); }, World);
         }
     } 
 }

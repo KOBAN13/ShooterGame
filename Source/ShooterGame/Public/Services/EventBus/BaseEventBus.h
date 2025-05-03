@@ -3,14 +3,15 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "EventVisitor.h"
+#include "FCallbackWithPriorityObject.h"
 #include "BaseEventBus.generated.h"
 
 UCLASS(Abstract)
 class SHOOTERGAME_API UBaseEventBus : public UObject
 {
 	GENERATED_BODY()
-    
+
+public:
     virtual void Subscribe(
         const FName EventName,
         const int32 Priority,
@@ -21,9 +22,25 @@ class SHOOTERGAME_API UBaseEventBus : public UObject
     
     virtual void SendEvent(
         const FName EventName,
-        void* EventObject = nullptr,
-        UScriptStruct* StructType = nullptr
+        void* EventObject = nullptr
     );
-
-    virtual void Accept(IEventVisitor* Visitor);
+    
+    template<typename TEvent, typename TCallback>
+    void ConvertAndBind(const TCallback& Callback, const TSharedPtr<FCallbackWithPriorityObject> EventReceiver)
+    {
+        if constexpr(std::is_same_v<TEvent, void>)
+        {
+            EventReceiver->SimpleDelegate.BindLambda([Callback]() { Callback(); });
+        }
+        else
+        {
+            EventReceiver->OneParamDelegate.BindLambda([Callback](UObject* Obj)
+            {
+                if(TEvent* TypedObj = Cast<TEvent>(Obj))
+                {
+                    Callback(TypedObj);
+                }
+            });
+        }
+    }
 };

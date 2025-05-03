@@ -1,15 +1,15 @@
 // Shoot Then Up Game, All Rights Reserved
 
 #include "Component/STUHealthComponent.h"
-#include "EventBusService.h"
-#include "EventNameConstants.h"
+
 #include "EventBusMacros.h"
-#include "STUGameInstance.h"
+#include "EventNameConstants.h"
 #include "STUIceDamageType.h"
 #include "ServiceLocatorHelper.h"
-#include "ServiceLocatorSubsystem.h"
+#include "StructEventBusService.h"
 #include "TweenService.h"
 
+class UVoidEventBusService;
 USTUHealthComponent::USTUHealthComponent()
 {
 	PrimaryComponentTick.bCanEverTick = false;
@@ -37,7 +37,7 @@ void USTUHealthComponent::OnTakeAnyDamage(
 
     StartHealthRecoveryTimer();
 
-    SEND_EVENT_STRUCT(EventNameConstants::OnHealthChanged, FHealthParameters, &HealthParameters);
+    SendEvent<FHealthParameters, UStructEventBusService>(EventNameConstants::OnHealthChanged, GetWorld(), &HealthParameters);
 
     if (const IDamageTypeInterface* DamageTypeInterface = Cast<IDamageTypeInterface>(DamageType))
     {
@@ -58,7 +58,8 @@ void USTUHealthComponent::OnTakeAnyDamage(
 
     if (IsDead())
     {
-        SEND_EVENT(EventNameConstants::OnCharacterDead);
+        SendEvent<UVoidEventBusService>(EventNameConstants::OnCharacterDead, GetWorld());
+        
         TweenService -> SteppedTweenKill(TweenId);
     }
 }
@@ -79,7 +80,9 @@ void USTUHealthComponent::StartHealthRecoveryTimer()
         [this](const float Health)
         {
             HealthParameters.Health = Health;
-            SEND_EVENT_STRUCT(EventNameConstants::OnHealthChanged, FHealthParameters, &HealthParameters);
+
+            SendEvent<FHealthParameters, UStructEventBusService>(EventNameConstants::OnHealthChanged, GetWorld(), &HealthParameters);
+            
             GEngine -> AddOnScreenDebugMessage(-1, 1.0f, FColor::Red, TEXT("Health: ") + FString::SanitizeFloat(Health));
         }
         );

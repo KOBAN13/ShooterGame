@@ -26,7 +26,7 @@ void UObjectEventBusService::Unsubscribe(const FName EventName)
     }
 }
 
-void UObjectEventBusService::SendEvent(const FName EventName, void* EventObject, UScriptStruct* StructType)
+void UObjectEventBusService::SendEvent(const FName EventName, void* EventObject)
 {
     UObject* EventObjectCast = nullptr;
     
