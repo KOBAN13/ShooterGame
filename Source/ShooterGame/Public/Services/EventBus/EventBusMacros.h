@@ -3,58 +3,45 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "EventBusService.h"
+#include "ObjectEventBusService.h"
+#include "ServiceLocatorHelper.h"
 #include "EventBusMacros.generated.h"
 
 class UEventBusService;
 
-#define SUBSCRIBE_EVENT(EventName, Priority, Callback) \
-    if(UEventBusService* EventBusService = UEventBusService::GetInstance()) \
-       EventBusService -> Subscribe(EventName, Priority, Callback); \
-    else \
-       UE_LOG(LogTemp, Error, TEXT("EventBus not initialized!")) \
+FORCEINLINE void Subscribe(
+    const FName EventName,
+    const int32 Priority,
+    const TFunction<void(void*)>& Callback,
+    UWorld* World
+)
+{
+    if (auto* EventBus = TryGetService<UObjectEventBusService>(World))
+    {
+        EventBus -> Subscribe(EventName, Priority, Callback);
+    }
+};
 
-#define SUBSCRIBE_OBJECT_EVENT(EventName, Priority, ObjectType, Callback) \
-    if(UEventBusService* EventBusService = UEventBusService::GetInstance()) \
-       EventBusService -> Subscribe<ObjectType>(EventName, Priority, Callback); \
-    else \
-       UE_LOG(LogTemp, Error, TEXT("EventBus not initialized!")) \
+FORCEINLINE void Unsubscribe(const FName EventName, UWorld* World)
+{
+    if (auto* EventBus = TryGetService<UObjectEventBusService>(World))
+    {
+        EventBus -> Unsubscribe(EventName);
+    }
+};
 
-#define SUBSCRIBE_STRUCT_EVENT(EventName, Priority, StructType, Callback) \
-    if(UEventBusService* EventBusService = UEventBusService::GetInstance()) \
-       EventBusService -> SubscribeStruct<StructType>(EventName, Priority, Callback); \
-    else \
-       UE_LOG(LogTemp, Error, TEXT("EventBus not initialized!")) \
-
-#define SEND_EVENT(EventName) \
-    if (UEventBusService* EventBusService = UEventBusService::GetInstance()) \
-        EventBusService -> SendEvent(EventName); \
-    else \
-        UE_LOG(LogTemp, Error, TEXT("EventBus not initialized!")) \
-
-#define SEND_EVENT_OBJECT(EventName, ObjectType, EventObject) \
-    if (UEventBusService* EventBusService = UEventBusService::GetInstance()) \
-        EventBusService -> SendEvent<ObjectType>(EventName, EventObject); \
-    else \
-        UE_LOG(LogTemp, Error, TEXT("EventBus not initialized!")) \
-
-#define SEND_EVENT_STRUCT(EventName, StructType, EventObject) \
-    if (UEventBusService* EventBusService = UEventBusService::GetInstance()) \
-        EventBusService -> SendEventStruct<StructType>(EventName, EventObject); \
-    else \
-        UE_LOG(LogTemp, Error, TEXT("EventBus not initialized!")) \
-
-#define UNSUBSCRIBE_EVENT(EventName) \
-    if(UEventBusService* EventBusService = UEventBusService::GetInstance()) \
-    EventBusService -> Unsubscribe(EventName) \
-    else \
-    UE_LOG(LogTemp, Error, TEXT("EventBus not initialized!")) \
-    
-#define UNSUBSCRIBE_EVENT_STRUCT(EventName) \
-    if(UEventBusService* EventBusService = UEventBusService::GetInstance()) \
-    EventBusService -> UnsubscribeStruct(EventName) \
-    else \
-    UE_LOG(LogTemp, Error, TEXT("EventBus not initialized!")) \
+FORCEINLINE void SendEvent(
+    const FName EventName,
+    void* EventObject,
+    UScriptStruct* StructType,
+    UWorld* World
+)
+{
+    if (auto* EventBus = TryGetService<UObjectEventBusService>(World))
+    {
+        EventBus -> SendEvent(EventName, EventObject, StructType);
+    }
+};
 
 class UEventBusService;
 UCLASS()

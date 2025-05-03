@@ -2,12 +2,15 @@
 
 #include "STUGameInstance.h"
 
+#include "ObjectEventBusService.h"
 #include "ResourceLoaderService.h"
-#include "TweenService.h"
 #include "ServiceLocatorSubsystem.h"
-#include "EventBusService.h"
+#include "StructEventBusService.h"
+#include "TweenService.h"
+#include "VoidEventBusService.h"
 
 void USTUGameInstance::Init()
+
 {
     Super::Init();
 
@@ -15,8 +18,10 @@ void USTUGameInstance::Init()
 
     ServiceLocatorSubsystem->RegisterService<UTweenService>(GetWorld(), UTweenService::StaticClass());
     ServiceLocatorSubsystem->RegisterService<UResourceLoaderService>(GetWorld(), UResourceLoaderService::StaticClass());
-    ServiceLocatorSubsystem->RegisterService<UEventBusService>(GetWorld(), UEventBusService::StaticClass());
-
+    ServiceLocatorSubsystem->RegisterService<UObjectEventBusService>(GetWorld(), UObjectEventBusService::StaticClass());
+    ServiceLocatorSubsystem->RegisterService<UVoidEventBusService>(GetWorld(), UObjectEventBusService::StaticClass());
+    ServiceLocatorSubsystem->RegisterService<UStructEventBusService>(GetWorld(), UObjectEventBusService::StaticClass());
+    
     UResourceLoaderService* ResourceLoaderService = nullptr;
     
     ServiceLocatorSubsystem -> TryGetService(ResourceLoaderService);
