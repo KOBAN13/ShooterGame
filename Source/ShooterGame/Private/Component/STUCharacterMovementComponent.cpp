@@ -52,7 +52,7 @@ void USTUCharacterMovementComponent::OnCharacterConfigLoaded()
 
 void USTUCharacterMovementComponent::Initialize()
 {
-    if (const auto* World = GetWorld())
+    if (auto* World = GetWorld())
     {
         if (const auto* GameInstance = Cast<USTUGameInstance>(World -> GetGameInstance()))
         {
@@ -68,8 +68,8 @@ void USTUCharacterMovementComponent::Initialize()
             check(TweenService)
             check(ResourceLoaderService)
 
-            Subscribe<void, UObjectEventBusService>(EventNameConstants::OnStartRun, 1, [this](void*) { RunStart(); }, World);
-            Subscribe<void, UObjectEventBusService>(EventNameConstants::OnStopRun, 1, [this](void*) { RunEnd(); }, World);
+            Subscribe_Void(EventNameConstants::OnStartRun, 1, [this]() { RunStart(); }, World);
+            Subscribe_Void(EventNameConstants::OnStopRun, 1, [this]() { RunEnd(); }, World);
         }
     } 
 }

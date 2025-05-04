@@ -20,18 +20,38 @@ class SHOOTERGAME_API UStructEventBusService : public UBaseEventBus
     UStructEventBusService();
 
 public:
-    virtual void Subscribe(
+    template<typename TStruct>
+    void Subscribe(
         const FName EventName,
         const int32 Priority,
-        const TFunction<void(void*)>& Callback
-    ) override;
+        const TFunction<void(TStruct*)>& Callback
+    )
+    {
+        AddReceiverStruct<TStruct>(EventName, Priority, Callback);
+    }
     
-    virtual void Unsubscribe(const FName EventName) override;
-    
-    virtual void SendEvent(
+    virtual void Unsubscribe(const FName EventName);
+
+    template<typename TStruct>
+    void SendEvent(
         const FName EventName,
-        void* EventObject
-    ) override;
+        TStruct* EventObject
+    )
+    {
+        if(!EventReceiversStruct.Contains(EventName))
+            return;
+
+        UScriptStruct* StructType = TStruct::StaticStruct();
+        void* Data = static_cast<void*>(EventObject);
+
+        for(const auto& Receiver : EventReceiversStruct[EventName])
+        {
+            if(Receiver.IsValid())
+            {
+                Receiver->StructDelegate.ExecuteIfBound(StructType, Data);
+            }
+        }
+    }
 
     
     template<typename TStruct>

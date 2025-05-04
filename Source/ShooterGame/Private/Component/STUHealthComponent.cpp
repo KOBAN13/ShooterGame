@@ -37,7 +37,7 @@ void USTUHealthComponent::OnTakeAnyDamage(
 
     StartHealthRecoveryTimer();
 
-    SendEvent<FHealthParameters, UStructEventBusService>(EventNameConstants::OnHealthChanged, GetWorld(), &HealthParameters);
+    SendEvent_OneParam<FHealthParameters, UStructEventBusService>(EventNameConstants::OnHealthChanged, GetWorld(), &HealthParameters);
 
     if (const IDamageTypeInterface* DamageTypeInterface = Cast<IDamageTypeInterface>(DamageType))
     {
@@ -58,7 +58,7 @@ void USTUHealthComponent::OnTakeAnyDamage(
 
     if (IsDead())
     {
-        SendEvent<UVoidEventBusService>(EventNameConstants::OnCharacterDead, GetWorld());
+        SendEvent_Void(EventNameConstants::OnCharacterDead, GetWorld());
         
         TweenService -> SteppedTweenKill(TweenId);
     }
@@ -81,7 +81,7 @@ void USTUHealthComponent::StartHealthRecoveryTimer()
         {
             HealthParameters.Health = Health;
 
-            SendEvent<FHealthParameters, UStructEventBusService>(EventNameConstants::OnHealthChanged, GetWorld(), &HealthParameters);
+            SendEvent_OneParam<FHealthParameters, UStructEventBusService>(EventNameConstants::OnHealthChanged, GetWorld(), &HealthParameters);
             
             GEngine -> AddOnScreenDebugMessage(-1, 1.0f, FColor::Red, TEXT("Health: ") + FString::SanitizeFloat(Health));
         }

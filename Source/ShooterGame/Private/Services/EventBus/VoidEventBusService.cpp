@@ -1,17 +1,12 @@
 // Shoot Then Up Game, All Rights Reserved
 
 #include "VoidEventBusService.h"
-
-UVoidEventBusService::UVoidEventBusService()
-{
-    EventReceiversVoid = TMap<FName, TArray<TSharedPtr<FCallbackWithPriorityObject>>>();
-    EventReceiverVoidHashToReference = TMap<size_t, TSharedPtr<FCallbackWithPriorityObject>>();
-}
+#include "FCallbackWithPriorityVoid.h"
 
 void UVoidEventBusService::Subscribe(
     const FName EventName,
     const int32 Priority,
-    const TFunction<void(void*)>& Callback
+    const TFunction<void()>& Callback
 )
 {
     AddReceiver<void>(EventName, Priority, Callback);
@@ -23,16 +18,13 @@ void UVoidEventBusService::Unsubscribe(const FName EventName)
     {
         if (Receiver.IsValid())
         {
-            EventReceiverVoidHashToReference.Remove(Receiver -> GetHashCode());
+            EventReceiverVoidHashToReference.Remove(Receiver->GetHashCode());
             EventReceiversVoid.Remove(EventName);
         }
     }
 }
 
-void UVoidEventBusService::SendEvent(
-    const FName EventName,
-    void* EventObject
-)
+void UVoidEventBusService::SendEvent(const FName EventName)
 {
     if (!EventReceiversVoid.Contains(EventName))
         return;

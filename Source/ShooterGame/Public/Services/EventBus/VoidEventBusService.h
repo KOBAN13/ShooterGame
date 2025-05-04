@@ -4,53 +4,53 @@
 
 #include "CoreMinimal.h"
 #include "BaseEventBus.h"
-#include "FCallbackWithPriorityObject.h"
+#include "FCallbackWithPriorityVoid.h"
 #include "VoidEventBusService.generated.h"
 
-struct FCallbackWithPriorityObject;
+struct FCallbackWithPriorityVoid;
 
 UCLASS()
 class SHOOTERGAME_API UVoidEventBusService : public UBaseEventBus
 {
 	GENERATED_BODY()
-
-    TMap<FName, TArray<TSharedPtr<FCallbackWithPriorityObject>>> EventReceiversVoid;
-    TMap<size_t, TSharedPtr<FCallbackWithPriorityObject>> EventReceiverVoidHashToReference;
-    
-    UVoidEventBusService();
+    TMap<FName, TArray<TSharedPtr<FCallbackWithPriorityVoid>>> EventReceiversVoid = TMap<FName, TArray<TSharedPtr<FCallbackWithPriorityVoid>>>();
+    TMap<size_t, TSharedPtr<FCallbackWithPriorityVoid>> EventReceiverVoidHashToReference = TMap<size_t, TSharedPtr<FCallbackWithPriorityVoid>>();
 
 public:
-    virtual void Subscribe(
+    void Subscribe(
         const FName EventName,
         const int32 Priority,
-        const TFunction<void(void*)>& Callback
-    ) override;
+        const TFunction<void()>& Callback
+    );
     
-    virtual void Unsubscribe(const FName EventName) override;
+    virtual void Unsubscribe(const FName EventName);
     
-    virtual void SendEvent(
-        const FName EventName,
-        void* EventObject
-    ) override;
+    virtual void SendEvent(const FName EventName);
 
-
+private:
     template<typename TEvent = void, typename TCallback>
     void AddReceiver(const FName EventName, const int32 Priority, const TCallback& Callback)
     {
-        TArray<TSharedPtr<FCallbackWithPriorityObject>>& Receivers = EventReceiversVoid.FindOrAdd(EventName);
+        TArray<TSharedPtr<FCallbackWithPriorityVoid>>& Receivers = EventReceiversVoid.FindOrAdd(EventName);
 
-        const TSharedPtr<FCallbackWithPriorityObject> EventReceiver = MakeShared<FCallbackWithPriorityObject>();
+        const TSharedPtr<FCallbackWithPriorityVoid> EventReceiver = MakeShared<FCallbackWithPriorityVoid>();
         EventReceiver -> Priority = Priority;
 
-        ConvertAndBind<TEvent>(Callback, EventReceiver);
+        ConvertAndBind(Callback, EventReceiver);
 
         Receivers.Add(EventReceiver);
         EventReceiverVoidHashToReference.Add(EventReceiver->GetHashCode(), EventReceiver);
 
-        Receivers.Sort([](const TSharedPtr<FCallbackWithPriorityObject>& A,
-                        const TSharedPtr<FCallbackWithPriorityObject>& B)
+        Receivers.Sort([](const TSharedPtr<FCallbackWithPriorityVoid>& A,
+                        const TSharedPtr<FCallbackWithPriorityVoid>& B)
         {
             return A -> Priority > B -> Priority;
         });
+    }
+    
+    template<typename TCallback>
+    static void ConvertAndBind(const TCallback& Callback, const TSharedPtr<FCallbackWithPriorityVoid> EventReceiver)
+    {
+        EventReceiver->SimpleDelegate.BindLambda([Callback]() { Callback(); });
     }
 };

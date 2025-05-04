@@ -13,7 +13,6 @@
 #include "Components/TextRenderComponent.h"
 #include "GameFramework/Controller.h"
 #include "STUWeaponComponent.h"
-#include "StructEventBusService.h"
 #include "VoidEventBusService.h"
 
 ASTUBaseCharacter::ASTUBaseCharacter(const FObjectInitializer &ObjectInitializer)
@@ -64,9 +63,8 @@ void ASTUBaseCharacter::BeginPlay()
     check(HealthComponent)
     check(WeaponComponent)
     check(CharacterMovementComponent)
-
-    Subscribe<UObjectEventBusService>(EventNameConstants::OnStartRun, 1, [this](void*) { RunStart(); }, GetWorld());
-    Subscribe<FHealthParameters, UStructEventBusService>(EventNameConstants::OnHealthChanged, 1, [this](FHealthParameters* Health) { OnHealthChanged(*Health);}, GetWorld());
+    
+    Subscribe_OneParamStruct<FHealthParameters>(EventNameConstants::OnHealthChanged, 1, [this](const FHealthParameters* Health) { OnHealthChanged(*Health);}, GetWorld());
 
     LandedDelegate.AddDynamic(this, &ASTUBaseCharacter::OnGroundedLanded);
 }
@@ -128,14 +126,14 @@ void ASTUBaseCharacter::RunStart()
 {
     bIsRun = true;
 
-    SendEvent<UVoidEventBusService>(EventNameConstants::OnStartRun, GetWorld());
+    SendEvent_Void(EventNameConstants::OnStartRun, GetWorld());
 }
 
 void ASTUBaseCharacter::RunEnd()
 {
     bIsRun = false;
 
-    SendEvent<UVoidEventBusService>(EventNameConstants::OnStopRun, GetWorld());
+    SendEvent_Void(EventNameConstants::OnStopRun, GetWorld());
 }
 
 void ASTUBaseCharacter::OnDeath()

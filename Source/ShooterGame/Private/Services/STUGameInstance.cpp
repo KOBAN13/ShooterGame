@@ -19,8 +19,8 @@ void USTUGameInstance::Init()
     ServiceLocatorSubsystem->RegisterService<UTweenService>(GetWorld(), UTweenService::StaticClass());
     ServiceLocatorSubsystem->RegisterService<UResourceLoaderService>(GetWorld(), UResourceLoaderService::StaticClass());
     ServiceLocatorSubsystem->RegisterService<UObjectEventBusService>(GetWorld(), UObjectEventBusService::StaticClass());
-    ServiceLocatorSubsystem->RegisterService<UVoidEventBusService>(GetWorld(), UObjectEventBusService::StaticClass());
-    ServiceLocatorSubsystem->RegisterService<UStructEventBusService>(GetWorld(), UObjectEventBusService::StaticClass());
+    ServiceLocatorSubsystem->RegisterService<UVoidEventBusService>(GetWorld(), UVoidEventBusService::StaticClass());
+    ServiceLocatorSubsystem->RegisterService<UStructEventBusService>(GetWorld(), UStructEventBusService::StaticClass());
     
     UResourceLoaderService* ResourceLoaderService = nullptr;
     

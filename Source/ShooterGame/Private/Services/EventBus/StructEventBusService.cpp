@@ -9,15 +9,6 @@ UStructEventBusService::UStructEventBusService()
     EventReceiverStructHashToReference = TMap<size_t, TSharedPtr<FCallbackWithPriorityStruct>>();
 }
 
-void UStructEventBusService::Subscribe(
-    const FName EventName,
-    const int32 Priority,
-    const TFunction<void(void*)>& Callback
-)
-{
-    AddReceiverStruct(EventName, Priority, Callback);
-}
-
 void UStructEventBusService::Unsubscribe(const FName EventName)
 {
     for (auto Receiver : EventReceiversStruct[EventName])
@@ -26,33 +17,6 @@ void UStructEventBusService::Unsubscribe(const FName EventName)
         {
             EventReceiverStructHashToReference.Remove(Receiver -> GetHashCode());
             EventReceiversStruct.Remove(EventName);
-        }
-    }
-}
-
-void UStructEventBusService::SendEvent(
-    const FName EventName,
-    void* EventObject
-)
-{
-    UScriptStruct* EventObjectCast = nullptr;
-    
-    if(!EventReceiversStruct.Contains(EventName))
-        return;
-
-    if(EventObjectCast != nullptr)
-    {
-        EventObjectCast = Cast<UScriptStruct>(EventObject);
-
-        if(EventObjectCast == nullptr)
-            return;
-    }
-
-    for(const auto& Receiver : EventReceiversStruct[EventName])
-    {
-        if(Receiver.IsValid())
-        {
-            Receiver->StructDelegate.ExecuteIfBound(EventObjectCast, EventObject);
         }
     }
 }
