@@ -63,7 +63,8 @@ void ASTUBaseCharacter::BeginPlay()
     check(HealthComponent)
     check(WeaponComponent)
     check(CharacterMovementComponent)
-    
+
+    Subscribe_Void(EventNameConstants::OnCharacterDead, 1, [this]() { OnDeath(); }, GetWorld());
     Subscribe_OneParamStruct<FHealthParameters>(EventNameConstants::OnHealthChanged, 1, [this](const FHealthParameters* Health) { OnHealthChanged(*Health);}, GetWorld());
 
     LandedDelegate.AddDynamic(this, &ASTUBaseCharacter::OnGroundedLanded);
