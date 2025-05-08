@@ -68,7 +68,4 @@ public:
             OnServiceUnregistered.Execute();
         }
     }
-
-public:
-    void Deinitialize();
 };

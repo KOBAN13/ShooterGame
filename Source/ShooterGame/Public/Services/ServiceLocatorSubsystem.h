@@ -35,8 +35,7 @@ public:
     {
         ServiceManager -> UnregisterService(OnServiceUnregistered);
     }
-
-    virtual void Deinitialize() override;
+    
     virtual void Initialize(FSubsystemCollectionBase& Collection) override;
     
     UServiceManager* GetServiceManager() const { return ServiceManager.Get(); }

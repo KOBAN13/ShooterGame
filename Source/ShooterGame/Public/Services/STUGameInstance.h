@@ -12,9 +12,8 @@ UCLASS()
 class SHOOTERGAME_API USTUGameInstance : public UGameInstance
 {
     GENERATED_BODY()
-
-    UPROPERTY()
-    UServiceLocatorSubsystem* ServiceLocatorSubsystem;
+    
+    TWeakObjectPtr<UServiceLocatorSubsystem> ServiceLocatorSubsystem;
     virtual void Init() override;
 
 public:

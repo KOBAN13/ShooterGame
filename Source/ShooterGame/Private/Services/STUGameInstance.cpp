@@ -10,7 +10,6 @@
 #include "VoidEventBusService.h"
 
 void USTUGameInstance::Init()
-
 {
     Super::Init();
 
@@ -31,5 +30,5 @@ void USTUGameInstance::Init()
 
 UServiceLocatorSubsystem* USTUGameInstance::GetServiceLocator() const
 {
-    return ServiceLocatorSubsystem;
+    return ServiceLocatorSubsystem.Get();
 }
