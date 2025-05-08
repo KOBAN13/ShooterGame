@@ -4,6 +4,10 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
+#include "Engine/World.h"
+#include "DrawDebugHelpers.h"
+#include "GameFramework/Character.h"
+#include "GameFramework/Controller.h"
 #include "STUBaseWeapon.generated.h"
 
 DECLARE_LOG_CATEGORY_CLASS(LogBaseWeapon, All, All);
@@ -19,10 +23,17 @@ public:
 	ASTUBaseWeapon();
 
     virtual void Fire();
+    virtual void MakeShot();
 
 protected:
     UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Components")
     USkeletalMeshComponent* WeaponMeshComponent;
+
+    UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Weapon")
+    FName MuzzleFlashSocketName = "MuzzleFlashSocket";
+
+    UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Weapon")
+    float TraceMaxDistance = 1500.f;
     
 	virtual void BeginPlay() override;
 };

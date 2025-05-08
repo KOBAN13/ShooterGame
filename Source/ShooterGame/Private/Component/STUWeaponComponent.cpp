@@ -31,6 +31,7 @@ void USTUWeaponComponent::CreateWeapon()
     const FAttachmentTransformRules AttachmentRules(EAttachmentRule::SnapToTarget, false);
 
     CurrentWeapon -> AttachToComponent(Character -> GetMesh(), AttachmentRules, WeaponSocketName);
+    CurrentWeapon -> SetOwner(GetOwner());
 }
 
 void USTUWeaponComponent::Fire()
