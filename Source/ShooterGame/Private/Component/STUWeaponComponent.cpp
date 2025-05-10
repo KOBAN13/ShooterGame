@@ -20,18 +20,18 @@ void USTUWeaponComponent::CreateWeapon()
 {
     auto* World = GetWorld();
     const auto* Character = Cast<ASTUBaseCharacter>(GetOwner());
-    
+
     check(World)
     check(Cast<ACharacter>(GetOwner()))
-    
-    CurrentWeapon = World -> SpawnActor<ASTUBaseWeapon>(WeaponClass);
+
+    CurrentWeapon = World->SpawnActor<ASTUBaseWeapon>(WeaponClass);
 
     check(CurrentWeapon.Get())
-    
+
     const FAttachmentTransformRules AttachmentRules(EAttachmentRule::SnapToTarget, false);
 
-    CurrentWeapon -> AttachToComponent(Character -> GetMesh(), AttachmentRules, WeaponSocketName);
-    CurrentWeapon -> SetOwner(GetOwner());
+    CurrentWeapon->AttachToComponent(Character->GetMesh(), AttachmentRules, WeaponSocketName);
+    CurrentWeapon->SetOwner(GetOwner());
 }
 
 void USTUWeaponComponent::Fire()

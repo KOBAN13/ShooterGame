@@ -36,4 +36,14 @@ protected:
     float TraceMaxDistance = 1500.f;
     
 	virtual void BeginPlay() override;
+
+private:
+    bool CanShoot() const;
+    bool GetTraceData(FVector& TraceStart, FVector& TraceEnd) const;
+    void PerformLineTrace(
+        const FVector& TraceStart,
+        const FVector& TraceEnd,
+        FHitResult& HitResult
+    ) const;
+    void DrawShotVisuals(const FHitResult& HitResult, const FVector& TraceEnd) const;
 };
