@@ -10,6 +10,7 @@
 #include "TweenService.h"
 
 class UVoidEventBusService;
+
 USTUHealthComponent::USTUHealthComponent()
 {
 	PrimaryComponentTick.bCanEverTick = false;

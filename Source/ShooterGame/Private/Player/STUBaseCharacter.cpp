@@ -12,8 +12,8 @@
 #include "STUHealthComponent.h"
 #include "Components/TextRenderComponent.h"
 #include "GameFramework/Controller.h"
+#include "Components/CapsuleComponent.h"
 #include "STUWeaponComponent.h"
-#include "VoidEventBusService.h"
 
 ASTUBaseCharacter::ASTUBaseCharacter(const FObjectInitializer &ObjectInitializer)
 : Super(ObjectInitializer.SetDefaultSubobjectClass<USTUCharacterMovementComponent>(CharacterMovementComponentName))
@@ -141,7 +141,9 @@ void ASTUBaseCharacter::OnDeath()
 {
     PlayAnimMontage(DeathAnimation);
 
-    CharacterMovementComponent->DisableMovement();
+    CharacterMovementComponent -> DisableMovement();
+
+    GetCapsuleComponent() -> SetCollisionResponseToAllChannels(ECR_Ignore);
 
     SetLifeSpan(5.0f);
 

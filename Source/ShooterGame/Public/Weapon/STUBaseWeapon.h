@@ -6,7 +6,6 @@
 #include "GameFramework/Actor.h"
 #include "Engine/World.h"
 #include "DrawDebugHelpers.h"
-#include "GameFramework/Character.h"
 #include "GameFramework/Controller.h"
 #include "STUBaseWeapon.generated.h"
 
@@ -24,6 +23,7 @@ public:
 
     virtual void Fire();
     virtual void MakeShot();
+    virtual void SetDamage(const FHitResult* HitResult);
 
 protected:
     UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Components")

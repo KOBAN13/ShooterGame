@@ -1,7 +1,9 @@
 // Shoot Then Up Game, All Rights Reserved
 
 #include "STUBaseWeapon.h"
+#include "Engine/DamageEvents.h"
 #include "Components/SkeletalMeshComponent.h"
+#include "GameFramework/Character.h"
 
 ASTUBaseWeapon::ASTUBaseWeapon()
 {
@@ -27,16 +29,28 @@ void ASTUBaseWeapon::Fire()
 
 void ASTUBaseWeapon::MakeShot()
 {
-    if(!CanShoot())
+    if (!CanShoot())
         return;
-    
+
     FVector TraceStart, TraceEnd;
     GetTraceData(TraceStart, TraceEnd);
-    
+
     FHitResult HitResult;
     PerformLineTrace(TraceStart, TraceEnd, HitResult);
 
+    SetDamage(&HitResult);
+
     DrawShotVisuals(HitResult, TraceEnd);
+}
+
+void ASTUBaseWeapon::SetDamage(const FHitResult* HitResult)
+{
+    auto* HitActor = HitResult -> GetActor();
+
+    if (!HitActor)
+        return;
+    
+    HitActor -> TakeDamage(10.0f, FDamageEvent{}, nullptr, this);
 }
 
 APlayerController* ASTUBaseWeapon::GetPlayerController() const
