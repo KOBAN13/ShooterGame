@@ -39,24 +39,28 @@ void ASTUBaseWeapon::MakeShot()
     DrawShotVisuals(HitResult, TraceEnd);
 }
 
+APlayerController* ASTUBaseWeapon::GetPlayerController() const
+{
+    const auto* Player = Cast<ACharacter>(GetOwner());
+    if (!Player)
+        return nullptr;
+
+    return Player->GetController<APlayerController>();
+}
+
 bool ASTUBaseWeapon::CanShoot() const
 {
     const auto* World = GetWorld();
     if (!World)
         return false;
 
-    const auto* Player = Cast<ACharacter>(GetOwner());
-    if (!Player)
-        return false;
-
-    const auto Controller = Player->GetController<APlayerController>();
+    const auto Controller = GetPlayerController();
     return Controller != nullptr;
 }
 
 bool ASTUBaseWeapon::GetTraceData(FVector& TraceStart, FVector& TraceEnd) const
 {
-    const auto* Player = Cast<ACharacter>(GetOwner());
-    const auto* Controller = Player->GetController<APlayerController>();
+    const auto* Controller = GetPlayerController();
     
     if (!Controller)
         return false;

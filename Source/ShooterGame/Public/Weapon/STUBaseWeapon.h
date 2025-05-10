@@ -38,6 +38,7 @@ protected:
 	virtual void BeginPlay() override;
 
 private:
+    APlayerController* GetPlayerController() const;
     bool CanShoot() const;
     bool GetTraceData(FVector& TraceStart, FVector& TraceEnd) const;
     void PerformLineTrace(
