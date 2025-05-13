@@ -18,10 +18,10 @@ class SHOOTERGAME_API USTUHealthComponent : public UActorComponent, public IHeal
 	GENERATED_BODY()
 
 public:
-    UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
+    UPROPERTY(EditAnywhere, BlueprintReadWrite)
     FHealthParameters HealthParameters;
 
-    UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
+    UPROPERTY(EditAnywhere, BlueprintReadWrite)
     FHealthRecoveryParameters HealthRecoveryParameters;
     
 	USTUHealthComponent();

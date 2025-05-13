@@ -34,6 +34,9 @@ void USTUHealthComponent::OnTakeAnyDamage(
     if (Damage <= 0.0f || IsDead())
         return;
 
+    UE_LOG(LogTemp, Warning, TEXT("Take Damage: %s"), *DamagedActor -> GetName());
+    
+
     HealthParameters.Health = FMath::Clamp(HealthParameters.Health - Damage, 0.0f, HealthParameters.MaxHealth);
 
     StartHealthRecoveryTimer();
