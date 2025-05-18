@@ -2,6 +2,9 @@
 
 #include "STUGameInstance.h"
 
+#include "ConstantsLoader.h"
+#include "EventBusMacros.h"
+#include "EventNameConstants.h"
 #include "ObjectEventBusService.h"
 #include "ResourceLoaderService.h"
 #include "ServiceLocatorSubsystem.h"
@@ -25,7 +28,17 @@ void USTUGameInstance::Init()
     
     ServiceLocatorSubsystem -> TryGetService(ResourceLoaderService);
 
-    ResourceLoaderService -> LoadResources();
+    ResourceLoaderService -> LoadResources(ConstantsLoader::CharacterConfig,
+        FSimpleDelegate::CreateLambda([this]()
+        {
+            SendEvent_Void(EventNameConstants::OnCharacterConfigLoaded, GetWorld());
+        }));
+    
+    ResourceLoaderService -> LoadResources(ConstantsLoader::BaseWeaponConfig,
+        FSimpleDelegate::CreateLambda([this]()
+        {
+            SendEvent_Void(EventNameConstants::OnBaseWeaponConfigLoaded, GetWorld());
+        }));
 }
 
 UServiceLocatorSubsystem* USTUGameInstance::GetServiceLocator() const

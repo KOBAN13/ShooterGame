@@ -51,6 +51,8 @@ private:
     FTimerHandle ShotTimerHandle;
     
     APlayerController* GetPlayerController() const;
+    void Initialize();
+    void OnBaseWeaponConfig();
     bool CanShoot() const;
     bool GetTraceData(FVector& TraceStart, FVector& TraceEnd) const;
     void PerformLineTrace(

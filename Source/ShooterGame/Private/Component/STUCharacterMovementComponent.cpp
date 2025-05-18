@@ -58,10 +58,7 @@ void USTUCharacterMovementComponent::Initialize()
         {
             const auto* ServiceLocator = GameInstance->GetServiceLocator();
 
-            if (ServiceLocator->TryGetService(ResourceLoaderService))
-            {
-                ResourceLoaderService->OnCharacterConfigLoaded.AddUObject(this, &USTUCharacterMovementComponent::OnCharacterConfigLoaded);
-            }
+            Subscribe_Void(EventNameConstants::OnCharacterConfigLoaded, 1, [this]() { OnCharacterConfigLoaded(); }, World);
 
             ServiceLocator -> TryGetService(TweenService);
 

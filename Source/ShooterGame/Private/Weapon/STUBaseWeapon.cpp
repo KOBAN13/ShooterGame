@@ -2,7 +2,12 @@
 
 #include "STUBaseWeapon.h"
 
-#include "MathUtil.h"
+#include "EventBusMacros.h"
+#include "EventNameConstants.h"
+#include "ResourceLoaderService.h"
+#include "STUCharacterMovementComponent.h"
+#include "STUGameInstance.h"
+#include "ServiceLocatorSubsystem.h"
 #include "Engine/DamageEvents.h"
 #include "Components/SkeletalMeshComponent.h"
 #include "GameFramework/Character.h"
@@ -13,6 +18,19 @@ ASTUBaseWeapon::ASTUBaseWeapon()
 
     WeaponMeshComponent = CreateDefaultSubobject<USkeletalMeshComponent>("WeaponMesh");
     SetRootComponent(WeaponMeshComponent);
+}
+
+void ASTUBaseWeapon::Initialize()
+{
+    if(auto* World = GetWorld())
+    {
+        Subscribe_Void(EventNameConstants::OnBaseWeaponConfigLoaded, 1, [this]() { OnBaseWeaponConfig(); }, World);
+    }
+}
+
+void ASTUBaseWeapon::OnBaseWeaponConfig()
+{
+    
 }
 
 void ASTUBaseWeapon::BeginPlay()

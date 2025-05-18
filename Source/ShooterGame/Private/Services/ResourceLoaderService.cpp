@@ -2,40 +2,39 @@
 
 #include "ResourceLoaderService.h"
 #include "Engine/StreamableManager.h"
-#include "ConstantsLoader.h"
 
 UResourceLoaderService::UResourceLoaderService()
 {
     ResourceMap = TMap<FName, UDataAsset*>();
 }
 
-void UResourceLoaderService::LoadResources()
+void UResourceLoaderService::LoadResources(const FName& Name,  FSimpleDelegate OnConfigLoaded)
 {
-    const FSoftObjectPath ConfigPath(ConstantsLoader::CharacterConfig);
+    const FSoftObjectPath ConfigPath(Name);
 
     if(!ConfigPath.IsValid())
     {
         UE_LOG(LogTemp, Error, TEXT("Invalid Character Config Path"));
         return;
-    }
+    }   
 
-    if (ResourceMap.Contains(ConstantsLoader::CharacterConfig))
+    if (ResourceMap.Contains(Name))
         return;
 
     
     TSharedPtr<FStreamableHandle> Handle =
         StreamableManager.RequestAsyncLoad(ConfigPath, FStreamableDelegate :: CreateLambda(
-                                                           [this, ConfigPath]()
+                                                           [this, ConfigPath, Name, OnConfigLoaded]()
                                                            {
                                                                if (UDataAsset* Config = Cast<UDataAsset>(ConfigPath.TryLoad()))
                                                                {
-                                                                   ResourceMap.Add(ConstantsLoader::CharacterConfig, Config);
-                                                                   OnCharacterConfigLoaded.Broadcast();
-                                                                   UE_LOG(LogTemp, Warning, TEXT("Loaded Character Config"));
+                                                                   ResourceMap.Add(Name, Config);
+                                                                   OnConfigLoaded.Execute();
+                                                                   UE_LOG(LogTemp, Warning, TEXT("Loaded %s"), *Name.ToString());
                                                                }
                                                                else
                                                                {
-                                                                   UE_LOG(LogTemp, Error, TEXT("Failed to load Character Config")); 
+                                                                   UE_LOG(LogTemp, Error, TEXT("Failed loaded to %s"), *Name.ToString()); 
                                                                }
                                                            }));
 }

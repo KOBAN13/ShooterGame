@@ -1,11 +1,14 @@
 ﻿#pragma once
 
 #include "CoreMinimal.h"
+#include "ConstantsMacros.h"
 
 namespace EventNameConstants
 {
-    static const FName OnStartRun(TEXT("OnStartRun"));
-    static const FName OnStopRun(TEXT("OnStopRun"));
-    static const FName OnCharacterDead(TEXT("OnCharacterDead"));
-    static const FName OnHealthChanged(TEXT("OnHealthChanged"));
+    static const FName OnStartRun = NAMEOF(OnStartRun);
+    static const FName OnStopRun = NAMEOF(OnStopRun);
+    static const FName OnCharacterDead = NAMEOF(OnCharacterDead);
+    static const FName OnHealthChanged = NAMEOF(OnHealthChanged);
+    static const FName OnCharacterConfigLoaded = NAMEOF(OnCharacterConfigLoaded);
+    static const FName OnBaseWeaponConfigLoaded = NAMEOF(OnBaseWeaponConfigLoaded);
 }

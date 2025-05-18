@@ -21,6 +21,7 @@ class SHOOTERGAME_API UResourceLoaderService : public UObject
 
 public:
     UDataAsset* GetResource(FName Name);
-    void LoadResources();
+    void LoadResources(const FName& Name,  FSimpleDelegate OnConfigLoaded);
+
     FOnCharacterConfigLoaded OnCharacterConfigLoaded;
 };
