@@ -34,9 +34,14 @@ void USTUWeaponComponent::CreateWeapon()
     CurrentWeapon->SetOwner(GetOwner());
 }
 
-void USTUWeaponComponent::Fire()
+void USTUWeaponComponent::StartFire()
 {
-    CurrentWeapon -> Fire();
+    CurrentWeapon -> StartFire();
+}
+
+void USTUWeaponComponent::StopFire()
+{
+    CurrentWeapon -> StopFire();
 }
 
 

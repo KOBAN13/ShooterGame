@@ -1,6 +1,8 @@
 // Shoot Then Up Game, All Rights Reserved
 
 #include "STUBaseWeapon.h"
+
+#include "MathUtil.h"
 #include "Engine/DamageEvents.h"
 #include "Components/SkeletalMeshComponent.h"
 #include "GameFramework/Character.h"
@@ -20,11 +22,22 @@ void ASTUBaseWeapon::BeginPlay()
     check(WeaponMeshComponent)
 }
 
-void ASTUBaseWeapon::Fire()
+void ASTUBaseWeapon::StartFire()
 {
-    UE_LOG(LogBaseWeapon, Warning, TEXT("Fire"));
+    GetWorldTimerManager()
+    .SetTimer(
+        ShotTimerHandle,
+        this,
+        &ASTUBaseWeapon::MakeShot,
+        TimeBetweenShots,
+        true
+    );
+}
 
-    MakeShot();
+void ASTUBaseWeapon::StopFire()
+{
+    GetWorldTimerManager()
+    .ClearTimer(ShotTimerHandle);
 }
 
 void ASTUBaseWeapon::MakeShot()
@@ -83,8 +96,10 @@ bool ASTUBaseWeapon::GetTraceData(FVector& TraceStart, FVector& TraceEnd) const
     FRotator ViewRotation;
     Controller -> GetPlayerViewPoint(ViewLocation, ViewRotation);
 
+    const auto HalfRad = FMath::DegreesToRadians(BulletSpreadInRadians);
+    const auto ShotDirection = FMath::VRandCone(ViewRotation.Vector(), HalfRad);
     TraceStart = ViewLocation;
-    TraceEnd = TraceStart + ViewRotation.Vector() * TraceMaxDistance;
+    TraceEnd = TraceStart + ShotDirection * TraceMaxDistance;
     return true;
 }
 

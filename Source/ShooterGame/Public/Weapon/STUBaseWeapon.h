@@ -21,7 +21,8 @@ class SHOOTERGAME_API ASTUBaseWeapon : public AActor
 public:	
 	ASTUBaseWeapon();
 
-    virtual void Fire();
+    virtual void StartFire();
+    virtual void StopFire();
     virtual void MakeShot();
     virtual void SetDamage(const FHitResult* HitResult);
 
@@ -34,10 +35,21 @@ protected:
 
     UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Weapon")
     float TraceMaxDistance = 1500.f;
+
+    UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Weapon")
+    float TimeBetweenShots = 0.1f;
+
+    UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Weapon")
+    float BulletSpreadInRadians = 2.0f;
+
+    //вынести в SO
     
 	virtual void BeginPlay() override;
 
 private:
+    UPROPERTY()
+    FTimerHandle ShotTimerHandle;
+    
     APlayerController* GetPlayerController() const;
     bool CanShoot() const;
     bool GetTraceData(FVector& TraceStart, FVector& TraceEnd) const;
